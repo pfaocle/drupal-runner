@@ -9,7 +9,7 @@ An extension to [Robo](https://github.com/Codegyre/Robo) for building Drupal.
 ### Composer
 
 1. Initialise your [RoboFile](https://github.com/Codegyre/Robo/blob/master/README.md#installing) using Composer.
-2. Add the Git repository [TBC].
+2. Add https://bitbucket.org/pfaocle/drupal-runner.git to `composer.json` as a VCS repository.
 3. Add `"pfaocle": "dev-master"` to `composer.json`.
 4. Run `composer update`.
 
