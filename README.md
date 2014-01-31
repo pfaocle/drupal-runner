@@ -8,15 +8,15 @@ An extension to [Robo](https://github.com/Codegyre/Robo) for building Drupal.
 
 ### Composer
 
-1. Initialise your [RoboFile](https://github.com/Codegyre/Robo/blob/master/README.md#installing) using Composer.
-2. Add https://bitbucket.org/pfaocle/drupal-runner.git to `composer.json` as a VCS repository.
+1. Initialise your [Robo installation using Composer](https://github.com/Codegyre/Robo/blob/master/README.md#installing).
+2. Add `https://bitbucket.org/pfaocle/drupal-runner.git` to `composer.json` as a VCS repository.
 3. Add `"pfaocle": "dev-master"` to `composer.json`.
 4. Run `composer update`.
 
 
 ## Configuration
 
-Check the `example.drupal.build.yml` file for more details. You will need to copy this file to `drupal.build.yml` in your Robo installation directory in order to use it.
+Check the `example.drupal.build.yml` file for more details. You will need to copy this file to `drupal.build.yml` in your Robo installation directory and edit according to your needs.
 
 
 ## Usage
