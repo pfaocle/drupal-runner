@@ -13,5 +13,9 @@
         "psr-4":{
             "Robo\\":"src"
         }
+    },
+
+    "require": {
+        "symfony/yaml": "*"
     }
 }
