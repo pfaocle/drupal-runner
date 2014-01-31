@@ -1,0 +1,11 @@
+{
+    "name": "pfaocle/drupal-runner",
+    "description": "An extension to Robo for building Drupal.",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Paul Byrne",
+            "email": "code@pfaocle.co.uk"
+        }
+    ]
+}
