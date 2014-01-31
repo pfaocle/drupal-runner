@@ -94,10 +94,17 @@ class DrupalRunner extends \Robo\Tasks
      * Step 0: build. Clone the Git repository and run drush make.
      *
      * @desc [0] Build the site
+     *
+     * @param $path
+     *   A full path to the target build directory.
+     *
+     * @throws \Exception
      */
     public function drupalBuild($path)
     {
-        // @todo Check if $path exists.
+        if (!file_exists($path)) {
+            throw new \Exception("Target directory $path does not exist.");
+        }
         $this->buildPath = $path;
 
         // Load configuration.
