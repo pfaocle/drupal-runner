@@ -51,6 +51,23 @@ class DrupalRunner extends \Robo\Tasks
     protected $config = array();
 
     /**
+     * @var bool
+     *   Whether we've already initialised a run.
+     */
+    protected $initialised;
+
+    /**
+     * Every task should run this first to establish we're good to run before any tasks are executed.
+     */
+    protected function init()
+    {
+        if (!$this->initialised) {
+            $this->config();
+            $this->initialised = true;
+        }
+    }
+
+    /**
      * Runs everything, from nuking the target directory through to working site.
      *
      * @desc Run all the things.
@@ -245,6 +262,7 @@ EOS;
      */
     public function drupalCleanup()
     {
+        $this->init();
         // Remove unwanted files.
         foreach ($this->unwantedFilesPatterns as $pattern) {
             $this->taskExec("rm -R {$this->path($pattern)}")->run();
