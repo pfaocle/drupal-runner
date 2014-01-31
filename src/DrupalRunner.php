@@ -55,12 +55,12 @@ class DrupalRunner extends \Robo\Tasks
      *
      * @desc Run all the things.
      */
-    public function magic($path)
+    public function drupalMagic($path)
     {
-        $this->build($path);
-        $this->install();
-        $this->pre();
-        $this->features();
+        $this->drupalBuild($path);
+        $this->drupalInstall();
+        $this->drupalPre();
+        $this->drupalFeatures();
 
         // Enable theme, if set.
         $config = $this->config();
@@ -68,9 +68,9 @@ class DrupalRunner extends \Robo\Tasks
         $this->drush("vset theme_default {$config['Site']['theme']}", false);
         $this->drush("dis {$this->drupalDefaultTheme}");
 
-        $this->migrate();
-        $this->post();
-        $this->cleanup();
+        $this->drupalMigrate();
+        $this->drupalPost();
+        $this->drupalCleanup();
     }
 
     /**
@@ -78,7 +78,7 @@ class DrupalRunner extends \Robo\Tasks
      *
      * @desc [0] Build the site
      */
-    public function build($path)
+    public function drupalBuild($path)
     {
         // @todo Check if $path exists.
         $this->buildPath = $path;
@@ -118,7 +118,7 @@ sleep(4);
      *
      * @desc [1] Install the site profile
      */
-    public function install()
+    public function drupalInstall()
     {
         $config = $this->config();
         $site = $config['Site'];
@@ -167,7 +167,7 @@ EOS;
      *
      * @desc [2] Pre-steps.
      */
-    public function pre()
+    public function drupalPre()
     {
         $config = $this->config();
         // Modules that need to be enabled before anything else.
@@ -185,7 +185,7 @@ EOS;
      *
      * @desc [3] Enable features..
      */
-    public function features()
+    public function drupalFeatures()
     {
         $config = $this->config();
         foreach ($config['Features'] as $feature) {
@@ -198,7 +198,7 @@ EOS;
      *
      * @desc [4] Migration.
      */
-    public function migrate()
+    public function drupalMigrate()
     {
         $this->drush('en migrate_ui');
 
@@ -230,7 +230,7 @@ EOS;
      *
      * @desc [5] Post-steps.
      */
-    public function post()
+    public function drupalPost()
     {
         $config = $this->config();
         foreach ($config['Post']['Commands'] as $command) {
@@ -243,7 +243,7 @@ EOS;
      *
      * @desc [6] Cleans uo unwanted files
      */
-    public function cleanup()
+    public function drupalCleanup()
     {
         // Remove unwanted files.
         foreach ($this->unwantedFilesPatterns as $pattern) {
