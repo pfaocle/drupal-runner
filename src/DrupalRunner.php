@@ -70,7 +70,7 @@ class DrupalRunner extends \Robo\Tasks
     /**
      * Runs everything, from nuking the target directory through to working site.
      *
-     * @desc Run all the things.
+     * @desc Run a complete rebuild
      */
     public function drupalMagic($path)
     {
@@ -93,7 +93,7 @@ class DrupalRunner extends \Robo\Tasks
     /**
      * Step 0: build. Clone the Git repository and run drush make.
      *
-     * @desc [0] Build the site
+     * @desc Build the site [0]
      *
      * @param $path
      *   A full path to the target build directory.
@@ -140,7 +140,7 @@ sleep(4);
     /**
      * Step 1: install.
      *
-     * @desc [1] Install the site profile
+     * @desc Install the site profile [1]
      */
     public function drupalInstall()
     {
@@ -189,7 +189,7 @@ EOS;
     /**
      * Step 2: Pre-steps.
      *
-     * @desc [2] Pre-steps.
+     * @desc Pre-steps [2]
      */
     public function drupalPre()
     {
@@ -207,7 +207,7 @@ EOS;
     /**
      * Step 3: Features.
      *
-     * @desc [3] Enable features..
+     * @desc Enable features [3]
      */
     public function drupalFeatures()
     {
@@ -220,7 +220,7 @@ EOS;
     /**
      * Step 4: Migration.
      *
-     * @desc [4] Migration.
+     * @desc Run data migration [4]
      */
     public function drupalMigrate()
     {
@@ -252,7 +252,7 @@ EOS;
     /**
      * Step 5: Post-steps.
      *
-     * @desc [5] Post-steps.
+     * @desc Post-steps [5]
      */
     public function drupalPost()
     {
@@ -265,7 +265,7 @@ EOS;
     /**
      * Step 6: cleanup.
      *
-     * @desc [6] Cleans uo unwanted files
+     * @desc Clean up unwanted files [6]
      */
     public function drupalCleanup()
     {
