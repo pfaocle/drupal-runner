@@ -283,11 +283,17 @@ EOS;
      *
      * @return array
      *   Parsed Yaml configuration.
+     *
+     * @throws \Exception
      */
     protected function config($refresh = false)
     {
+        $configFile = getcwd() . '/drupal.build.yml';
+        if (!file_exists($configFile)) {
+            throw new \Exception('Build configuration could not be found.');
+        }
         if ($refresh || empty($this->config)) {
-            $this->config = Yaml::parse(file_get_contents(getcwd() . '/drupal.build.yml'));
+            $this->config = Yaml::parse(file_get_contents($configFile));
         }
         return $this->config;
     }
