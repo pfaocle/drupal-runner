@@ -323,13 +323,15 @@ EOS;
     protected function runSteps($type){
         if ('Pre' == $type || 'Post' == $type) {
             $config = $this->config();
-            // Modules.
-            foreach ($config[$type]['Modules'] as $module) {
-                $this->drush("en $module");
-            }
-            // Drush commands.
-            foreach ($config[$type]['Commands'] as $command) {
-                $this->drush($command);
+
+            foreach (array('Modules', 'Commands') as $section) {
+                if (isset($config[$type][$section])) {
+                    foreach ($config[$type][$section] as $arg) {
+                        $this->drush(
+                            ('Modules' == $section ? 'en ' : '') . $arg
+                        );
+                    }
+                }
             }
         }
     }
