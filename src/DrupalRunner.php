@@ -78,13 +78,7 @@ class DrupalRunner extends \Robo\Tasks
         $this->drupalInstall();
         $this->drupalPre();
         $this->drupalFeatures();
-
-        // Enable theme, if set.
-        $config = $this->config();
-        $this->drush("en {$config['Site']['theme']}");
-        $this->drush("vset theme_default {$config['Site']['theme']}", false);
-        $this->drush("dis {$this->drupalDefaultTheme}");
-
+        $this->drupalTheme();
         $this->drupalMigrate();
         $this->drupalPost();
         $this->drupalCleanup();
@@ -187,7 +181,7 @@ EOS;
 
 
     /**
-     * Step 2: Pre-steps.
+     * Step 2: pre-steps.
      *
      * @desc Pre-steps [2]
      */
@@ -205,7 +199,7 @@ EOS;
     }
 
     /**
-     * Step 3: Features.
+     * Step 3: features.
      *
      * @desc Enable features [3]
      */
@@ -218,9 +212,23 @@ EOS;
     }
 
     /**
-     * Step 4: Migration.
+     * Step 4: theme. Enable theme and disable the Drupal default.
      *
-     * @desc Run data migration [4]
+     * @desc Enable theme [4]
+     */
+    public function drupalTheme()
+    {
+        // Enable theme, if set.
+        $config = $this->config();
+        $this->drush("en {$config['Site']['theme']}");
+        $this->drush("vset theme_default {$config['Site']['theme']}", false);
+        $this->drush("dis {$this->drupalDefaultTheme}");
+    }
+
+    /**
+     * Step 5: migration.
+     *
+     * @desc Run data migration [5]
      */
     public function drupalMigrate()
     {
@@ -250,9 +258,9 @@ EOS;
     }
 
     /**
-     * Step 5: Post-steps.
+     * Step 6: post-steps.
      *
-     * @desc Post-steps [5]
+     * @desc Post-steps [6]
      */
     public function drupalPost()
     {
@@ -263,9 +271,9 @@ EOS;
     }
 
     /**
-     * Step 6: cleanup.
+     * Step 7: cleanup.
      *
-     * @desc Clean up unwanted files [6]
+     * @desc Clean up unwanted files [7]
      */
     public function drupalCleanup()
     {
