@@ -1,7 +1,7 @@
 {
     "name": "pfaocle/drupal-runner",
     "description": "An extension to Robo for building Drupal.",
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Paul Byrne",
