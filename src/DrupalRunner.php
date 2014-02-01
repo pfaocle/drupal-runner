@@ -149,7 +149,7 @@ sleep(4);
         $db = $config['Database'];
 
         // Site install.
-        $cmd = "site-install minimal \\
+        $cmd = "site-install {$config['Build']['profile']} \\
                     --db-url=mysql://{$db['user']}:{$db['password']}@localhost/{$db['name']} \\
                     --sites-subdir={$config['Build']['sites-subdir']} \\
                     --site-name=\"{$site['name']}\" \\
