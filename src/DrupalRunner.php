@@ -122,7 +122,7 @@ class DrupalRunner extends \Robo\Tasks
 //        $this->taskCleanDir([
 //            '.'
 //        ])->run();
-sleep(4);
+
         // Clone the Git repository.
         $this->taskExec(
             "git clone {$config['Build']['git']} {$this->path('sites/' . $config['Build']['sites-subdir'])}"
