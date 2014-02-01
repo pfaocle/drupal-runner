@@ -109,11 +109,21 @@ class DrupalRunner extends \Robo\Tasks
         )->run();
 
         // Write $sites.php file.
-        $sitesFile = "<?php\n";
-        foreach ($config['Build']['sites'] as $site) {
-            $sitesFile .= "  \$sites['$site'] = '{$config['Build']['sites-subdir']}';\n";
+        if (isset($config['Build']['sites']) && count($config['Build']['sites']) > 0) {
+            $sitesFilePath = $this->path('sites/sites.php');
+            // @todo Template?
+            file_put_contents($sitesFilePath, "<?php\n  %sites");
+            $this->taskReplaceInFile($sitesFilePath)
+                ->from('%sites')
+                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $config['Build']['sites'])))
+                ->run();
         }
-        file_put_contents($this->path('sites/sites.php'), $sitesFile);
+    }
+
+    protected function sitesFileLineCallback($line)
+    {
+        $config = $this->config();
+        return sprintf(DrupalBuild::$sitesFileLinePattern, $line, $config['Build']['sites-subdir']);
     }
 
     /**

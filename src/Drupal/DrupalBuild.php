@@ -32,6 +32,12 @@ class DrupalBuild
 
     /**
      * @var string
+     *   The definition of a line/pattern in $sites.php
+     */
+    public static $sitesFileLinePattern = "\$sites['%s'] = '%s';";
+
+    /**
+     * @var string
      *   Drupal's default theme.
      */
     public static $drupalDefaultTheme = 'bartik';
