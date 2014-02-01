@@ -107,6 +107,13 @@ class DrupalRunner extends \Robo\Tasks
         $this->taskExec(
             "cd {$this->path()} && drush -y make sites/{$config['Build']['sites-subdir']}/{$config['Build']['make']} ."
         )->run();
+
+        // Write $sites.php file.
+        $sitesFile = "<?php\n";
+        foreach ($config['Build']['sites'] as $site) {
+            $sitesFile .= "  \$sites['$site'] = '{$config['Build']['sites-subdir']}';\n";
+        }
+        file_put_contents($this->path('sites/sites.php'), $sitesFile);
     }
 
     /**
@@ -128,13 +135,6 @@ class DrupalRunner extends \Robo\Tasks
                     --account-name={$site['rootuser']} \\
                     --account-pass={$site['rootpassword']}";
         $this->drush($cmd);
-
-        // Write the sites.php file.
-        $sitesFile = "<?php\n";
-        foreach ($config['Build']['sites'] as $site) {
-            $sitesFile .= "  \$sites['$site'] = '{$config['Build']['sites-subdir']}';\n";
-        }
-        file_put_contents($this->path('sites/sites.php'), $sitesFile);
 
         // Include settings.$env.php
         $env = 'local';
