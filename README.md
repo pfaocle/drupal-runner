@@ -40,7 +40,7 @@ _Note:_ you may also need to also run Composer for Robo as well as your own set-
 
 ## Configuration
 
-Check the `example.drupal.build.yml` file for more details. You will need to copy this file to `drupal.build.yml` in your Robo installation directory and edit according to your needs.
+Check `example.drupal.build.yml` for more details. You will need to copy this file to `drupal.build.yml` in your Robo installation directory and edit according to your needs.
 
 
 ## Usage
