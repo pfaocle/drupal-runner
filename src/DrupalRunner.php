@@ -6,6 +6,7 @@
 
 namespace Robo;
 
+use Robo\Drupal\DrupalBuild;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -15,29 +16,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DrupalRunner extends \Robo\Tasks
 {
-    /**
-     * @var array
-     *   A list of Drupal's hidden files (to remove).
-     */
-    protected $drupalHiddenFiles = array('.htaccess', '.gitignore');
-
-    /**
-     * @var array
-     *   List of file patterns to recursively remove during cleanup.
-     */
-    protected $unwantedFilesPatterns = array(
-        '*txt',
-        'install.php',
-        'scripts',
-        'web.config',
-    );
-
-    /**
-     * @var string
-     *   Drupal's default theme.
-     */
-    protected $drupalDefaultTheme = 'bartik';
-
     /**
      * @var string
      *   An absolute path to the directory in which to build.
@@ -109,7 +87,7 @@ class DrupalRunner extends \Robo\Tasks
             "cd {$this->path()} && rm -Rf *"
         )->run();
         $this->taskExec(
-            "cd {$this->path()} && rm -f " . implode(' ', $this->drupalHiddenFiles)
+            "cd {$this->path()} && rm -f " . implode(' ', DrupalBuild::$drupalHiddenFiles)
         )->run();
 
         // @todo This errors:
@@ -222,7 +200,7 @@ EOS;
         $config = $this->config();
         $this->drush("en {$config['Site']['theme']}");
         $this->drush("vset theme_default {$config['Site']['theme']}", false);
-        $this->drush("dis {$this->drupalDefaultTheme}");
+        $this->drush('dis ' . DrupalBuild::$drupalDefaultTheme);
     }
 
     /**
@@ -279,7 +257,7 @@ EOS;
     {
         $this->init();
         // Remove unwanted files.
-        foreach ($this->unwantedFilesPatterns as $pattern) {
+        foreach (DrupalBuild::$unwantedFilesPatterns as $pattern) {
             $this->taskExec("rm -R {$this->path($pattern)}")->run();
         }
 
