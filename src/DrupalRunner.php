@@ -159,21 +159,13 @@ EOS;
 
 
     /**
-     * Step 2: pre-steps.
+     * Step 2: pre-steps. Run Drush commands and enable modules - steps that should happen before anything else.
      *
      * @desc Pre-steps [2]
      */
     public function drupalPre()
     {
-        $config = $this->config();
-        // Modules that need to be enabled before anything else.
-        foreach ($config['Pre']['Modules'] as $module) {
-            $this->drush("en $module");
-        }
-        // Pre-commands.
-        foreach ($config['Pre']['Commands'] as $command) {
-            $this->drush($command);
-        }
+        $this->runSteps('Pre');
     }
 
     /**
@@ -236,16 +228,13 @@ EOS;
     }
 
     /**
-     * Step 6: post-steps.
+     * Step 6: post-steps. Drush ommands to run and modules to enable after everything else, but before clean-up.
      *
      * @desc Post-steps [6]
      */
     public function drupalPost()
     {
-        $config = $this->config();
-        foreach ($config['Post']['Commands'] as $command) {
-            $this->drush($command);
-        }
+        $this->runSteps('Post');
     }
 
     /**
@@ -324,5 +313,24 @@ EOS;
             return $this->buildPath;
         }
         return $this->buildPath . DIRECTORY_SEPARATOR . $path;
+    }
+
+    /**
+     * Helper function for pre- and post-steps.
+     *
+     * @param $type
+     */
+    protected function runSteps($type){
+        if ('Pre' == $type || 'Post' == $type) {
+            $config = $this->config();
+            // Modules.
+            foreach ($config[$type]['Modules'] as $module) {
+                $this->drush("en $module");
+            }
+            // Drush commands.
+            foreach ($config[$type]['Commands'] as $command) {
+                $this->drush($command);
+            }
+        }
     }
 }
