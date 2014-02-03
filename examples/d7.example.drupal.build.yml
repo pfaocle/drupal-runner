@@ -1,0 +1,29 @@
+#
+# Example build configuration for a vanilla Drupal 7 site. Rename this file to 'drupal.build.yml' to enable. See
+# example.drupal.build.yml in the drupal-runner directory for more details on all the build configuration options
+# available.
+#
+# Configuration for this build.
+#
+
+# Build details - Git, remotes, Drush, make file etc.
+Build:
+    git: https://github.com/pfaocle/d7-drupal-runner-example.git
+    drush-alias: @d7.local
+    profile: minimal
+    sites-subdir: d7
+    make: make/d7.make
+    sites:
+        - 8080.d7.drupal.dev
+
+# Site details - name and root user credentials.
+Site:
+    name: Drupal 7
+    rootuser: root
+    rootpassword: root
+
+# Database details.
+Database:
+    name: d7
+    user: root
+    password: password
