@@ -1,0 +1,7 @@
+#
+# .gitignore file for Drupal Runner.
+#
+
+# Composer files and vendor packages.
+vendor/
+composer.lock
