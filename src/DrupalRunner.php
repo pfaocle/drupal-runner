@@ -277,16 +277,28 @@ EOS;
      *   Drush command to run, complete with arguments.
      * @param bool $force
      *   Whether to force the command with '-y'.
+     *
+     * @throws \Exception
      */
     protected function drush($command, $force = true)
     {
-        $cmd = ($force ? 'drush -y' : 'drush');
+        $drushCmd = ($force ? 'drush -y' : 'drush');
         $buildConfig = $this->config('Build');
         if (array_key_exists('drush-alias', $buildConfig)) {
-            $cmd .= ' ' . $buildConfig['drush-alias'];
+            $drushCmd .= ' ' . $buildConfig['drush-alias'];
         }
         // @todo Where does the output go when using Drush aliases/remotes?
-        $this->taskExec($cmd . ' ' . $command)->run();
+        $ret = $this->taskExec("$drushCmd $command")->run();
+
+        // Any non-zero exit status should be handled here.
+        if ($ret) {
+            // Clean up the output a bit...
+            $shortCmd = str_replace("\n", '', preg_replace('/\s+/', ' ', $command));
+            if (strlen($shortCmd) > 50) {
+                $shortCmd = substr($shortCmd, 0, 50) . '...';
+            }
+            throw new \Exception(sprintf('The Drush command "%s" was not successful.', $shortCmd));
+        }
     }
 
     /**
