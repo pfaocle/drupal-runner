@@ -49,6 +49,9 @@ class DrupalRunner extends \Robo\Tasks
      * Runs everything, from nuking the target directory through to working site.
      *
      * @desc Run a complete rebuild
+     *
+     * @param $path
+     *   An absolute file path to the target build directory.
      */
     public function drupalMagic($path)
     {
@@ -68,7 +71,7 @@ class DrupalRunner extends \Robo\Tasks
      * @desc Build the site [0]
      *
      * @param $path
-     *   A full path to the target build directory.
+     *   An absolute file path to the target build directory.
      *
      * @throws \Exception
      */
@@ -272,7 +275,6 @@ EOS;
      *
      * @param string $command
      *   Drush command to run, complete with arguments.
-     *
      * @param bool $force
      *   Whether to force the command with '-y'.
      */
@@ -341,7 +343,7 @@ EOS;
      * Returns an absolute path to a given relative one.
      *
      * @param string $path
-     *   A path relative to the build directory root. Should not start or end with a /.
+     *   A path relative to the build directory root. Should not start or end with a /
      *
      * @return string
      *   The absolute path.
@@ -357,7 +359,8 @@ EOS;
     /**
      * Helper function for pre- and post-steps.
      *
-     * @param $type
+     * @param string $type
+     *   The type of steps to run, either 'Pre' or 'Post'.
      */
     protected function runSteps($type){
         if ('Pre' == $type || 'Post' == $type) {
