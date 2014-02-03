@@ -236,7 +236,7 @@ EOS;
     }
 
     /**
-     * Step 6: post-steps. Drush ommands to run and modules to enable after everything else, but before clean-up.
+     * Step 6: post-steps. Drush commands to run and modules to enable after everything else, but before clean-up.
      *
      * @desc Post-steps [6]
      */
@@ -280,7 +280,7 @@ EOS;
             $cmd .= ' ' . $buildConfig['drush-alias'];
         }
         // @todo Where does the output go when using Drush aliases/remotes?
-        $this->taskExec($cmd .' ' . $command)->run();
+        $this->taskExec($cmd . ' ' . $command)->run();
     }
 
     /**
