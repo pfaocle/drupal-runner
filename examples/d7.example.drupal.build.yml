@@ -1,7 +1,11 @@
 #
-# Example build configuration for a vanilla Drupal 7 site. Rename this file to 'drupal.build.yml' to enable. See
-# example.drupal.build.yml in the drupal-runner directory for more details on all the build configuration options
-# available.
+# Example build configuration for a vanilla Drupal 7 site. Rename this file to `drupal.build.yml` and move it to your
+# root Robo directory to enable. See `example.drupal.build.yml` in the drupal-runner directory for more details on
+# all the build configuration options available.
+#
+# @see https://github.com/pfaocle/d7-drupal-runner-example/blob/master/README.md
+#
+
 #
 # Configuration for this build.
 #
