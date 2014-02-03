@@ -300,6 +300,20 @@ EOS;
      */
     protected function config($section = '', $refresh = false)
     {
+        $validConfig = array(
+            'Build',
+            'Site',
+            'Database',
+            'Pre',
+            'Features',
+            'Migrate',
+            'Post',
+        );
+
+        if (!empty($section) && !in_array($section, $validConfig)) {
+            throw new \Exception($section . ' is not a valid build configuration section,');
+        }
+
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
             $configFile = getcwd() . '/drupal.build.yml';
@@ -312,9 +326,6 @@ EOS;
         if (!empty($section)) {
             if (array_key_exists($section, $this->config)) {
                 return $this->config[$section];
-            }
-            else {
-                throw new \Exception($section . ' is not a valid build configuration section,');
             }
         } else {
             return $this->config;
