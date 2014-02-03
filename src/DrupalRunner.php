@@ -288,24 +288,37 @@ EOS;
     /**
      * Loads and returns the build configuration.
      *
+     * @param string $section
+     *   The section of configuration to load/return.
      * @param bool $refresh
      *   Load in config from file.
      *
      * @return array
-     *   Parsed Yaml configuration.
+     *   Parsed YAML configuration for $section, or the full configuration if $section not set.
      *
      * @throws \Exception
      */
-    protected function config($refresh = false)
+    protected function config($section = '', $refresh = false)
     {
-        $configFile = getcwd() . '/drupal.build.yml';
-        if (!file_exists($configFile)) {
-            throw new \Exception('Build configuration could not be found.');
-        }
+        // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
+            $configFile = getcwd() . '/drupal.build.yml';
+            if (!file_exists($configFile)) {
+                throw new \Exception('Build configuration could not be found.');
+            }
             $this->config = Yaml::parse(file_get_contents($configFile));
         }
-        return $this->config;
+
+        if (!empty($section)) {
+            if (array_key_exists($section, $this->config)) {
+                return $this->config[$section];
+            }
+            else {
+                throw new \Exception($section . ' is not a valid build configuration section,');
+            }
+        } else {
+            return $this->config;
+        }
     }
 
     /**
