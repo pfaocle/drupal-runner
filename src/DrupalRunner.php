@@ -199,9 +199,11 @@ EOS;
     {
         // Enable theme, if set.
         $siteConfig = $this->config('Site');
-        $this->drush("en {$siteConfig['theme']}");
-        $this->drush("vset theme_default {$siteConfig['theme']}", false);
-        $this->drush('dis ' . DrupalBuild::$drupalDefaultTheme);
+        if (isset($siteConfig['theme'])) {
+            $this->drush("en {$siteConfig['theme']}");
+            $this->drush("vset theme_default {$siteConfig['theme']}", false);
+            $this->drush('dis ' . DrupalBuild::$drupalDefaultTheme);
+        }
     }
 
     /**
