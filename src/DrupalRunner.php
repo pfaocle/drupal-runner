@@ -211,27 +211,29 @@ EOS;
      */
     public function drupalMigrate()
     {
-        $this->drush('en migrate_ui');
-
         $migrateConfig = $this->config('Migrate');
 
-        if (isset($migrateConfig['Source']['Files'])) {
-            $this->drush(
-                "vset {$migrateConfig['Source']['Files']['variable']} \\
-                    \"{$migrateConfig['Source']['Files']['dir']}\""
-            );
-        }
+        if (!empty($migrateConfig)) {
+            // We assume we'll want both Migrate UI and Migrate modules.
+            $this->drush('en migrate_ui');
+            if (isset($migrateConfig['Source']['Files'])) {
+                $this->drush(
+                    "vset {$migrateConfig['Source']['Files']['variable']} \\
+                        \"{$migrateConfig['Source']['Files']['dir']}\""
+                );
+            }
 
-        foreach ($migrateConfig['Dependencies'] as $dependency) {
-            $this->drush("en $dependency");
-        }
+            foreach ($migrateConfig['Dependencies'] as $dependency) {
+                $this->drush("en $dependency");
+            }
 
-        foreach ($migrateConfig['Groups'] as $group) {
-            $this->drush("mi --group=$group");
-        }
+            foreach ($migrateConfig['Groups'] as $group) {
+                $this->drush("mi --group=$group");
+            }
 
-        foreach ($migrateConfig['Migrations'] as $migration) {
-            $this->drush("mi $migration");
+            foreach ($migrateConfig['Migrations'] as $migration) {
+                $this->drush("mi $migration");
+            }
         }
     }
 
