@@ -79,8 +79,8 @@ class DrupalRunner extends \Robo\Tasks
         }
         $this->buildPath = $path;
 
-        // Load configuration.
-        $config = $this->config();
+        // Load build configuration.
+        $buildConfig = $this->config('Build');
 
         // Empty the build directory.
         $this->taskExec(
@@ -97,7 +97,7 @@ class DrupalRunner extends \Robo\Tasks
 
         // Clone the Git repository.
         $this->taskExec(
-            "git clone {$config['Build']['git']} {$this->path('sites/' . $config['Build']['sites-subdir'])}"
+            "git clone {$buildConfig['git']} {$this->path('sites/' . $buildConfig['sites-subdir'])}"
         )->run();
 
         // Drush make.
@@ -105,25 +105,25 @@ class DrupalRunner extends \Robo\Tasks
         // Note that we need to change directory here, so don't wrap the path to make file in a call to path(). We also
         // avoid using $this->drush() as currently this is run on the host machine.
         $this->taskExec(
-            "cd {$this->path()} && drush -y make sites/{$config['Build']['sites-subdir']}/{$config['Build']['make']} ."
+            "cd {$this->path()} && drush -y make sites/{$buildConfig['sites-subdir']}/{$buildConfig['make']} ."
         )->run();
 
         // Write $sites.php file.
-        if (isset($config['Build']['sites']) && count($config['Build']['sites']) > 0) {
+        if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
             $sitesFilePath = $this->path('sites/sites.php');
             // @todo Template?
             file_put_contents($sitesFilePath, "<?php\n  %sites");
             $this->taskReplaceInFile($sitesFilePath)
                 ->from('%sites')
-                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $config['Build']['sites'])))
+                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
                 ->run();
         }
     }
 
     protected function sitesFileLineCallback($line)
     {
-        $config = $this->config();
-        return sprintf(DrupalBuild::$sitesFileLinePattern, $line, $config['Build']['sites-subdir']);
+        $buildConfig = $this->config('Build');
+        return sprintf(DrupalBuild::$sitesFileLinePattern, $line, $buildConfig['sites-subdir']);
     }
 
     /**
@@ -185,8 +185,7 @@ EOS;
      */
     public function drupalFeatures()
     {
-        $config = $this->config();
-        foreach ($config['Features'] as $feature) {
+        foreach ($this->config('Features') as $feature) {
             $this->drush("en $feature");
         }
     }
@@ -199,9 +198,9 @@ EOS;
     public function drupalTheme()
     {
         // Enable theme, if set.
-        $config = $this->config();
-        $this->drush("en {$config['Site']['theme']}");
-        $this->drush("vset theme_default {$config['Site']['theme']}", false);
+        $siteConfig = $this->config('Site');
+        $this->drush("en {$siteConfig['theme']}");
+        $this->drush("vset theme_default {$siteConfig['theme']}", false);
         $this->drush('dis ' . DrupalBuild::$drupalDefaultTheme);
     }
 
@@ -214,25 +213,24 @@ EOS;
     {
         $this->drush('en migrate_ui');
 
-        $config = $this->config();
-        $config = $config['Migrate'];
+        $migrateConfig = $this->config('Migrate');
 
-        if (isset($config['Source']['Files'])) {
+        if (isset($migrateConfig['Source']['Files'])) {
             $this->drush(
-                "vset {$config['Source']['Files']['variable']} \\
-                    \"{$config['Source']['Files']['dir']}\""
+                "vset {$migrateConfig['Source']['Files']['variable']} \\
+                    \"{$migrateConfig['Source']['Files']['dir']}\""
             );
         }
 
-        foreach ($config['Dependencies'] as $dependency) {
+        foreach ($migrateConfig['Dependencies'] as $dependency) {
             $this->drush("en $dependency");
         }
 
-        foreach ($config['Groups'] as $group) {
+        foreach ($migrateConfig['Groups'] as $group) {
             $this->drush("mi --group=$group");
         }
 
-        foreach ($config['Migrations'] as $migration) {
+        foreach ($migrateConfig['Migrations'] as $migration) {
             $this->drush("mi $migration");
         }
     }
@@ -277,9 +275,9 @@ EOS;
     protected function drush($command, $force = true)
     {
         $cmd = ($force ? 'drush -y' : 'drush');
-        $config = $this->config();
-        if (array_key_exists('drush-alias', $config['Build'])) {
-            $cmd .= ' ' . $config['Build']['drush-alias'];
+        $buildConfig = $this->config('Build');
+        if (array_key_exists('drush-alias', $buildConfig)) {
+            $cmd .= ' ' . $buildConfig['drush-alias'];
         }
         // @todo Where does the output go when using Drush aliases/remotes?
         $this->taskExec($cmd .' ' . $command)->run();
@@ -345,11 +343,11 @@ EOS;
      */
     protected function runSteps($type){
         if ('Pre' == $type || 'Post' == $type) {
-            $config = $this->config();
+            $stepsConfig = $this->config($type);
 
             foreach (array('Modules', 'Commands') as $section) {
-                if (isset($config[$type][$section])) {
-                    foreach ($config[$type][$section] as $arg) {
+                if (isset($stepsConfig[$section])) {
+                    foreach ($stepsConfig[$section] as $arg) {
                         $this->drush(
                             ('Modules' == $section ? 'en ' : '') . $arg
                         );
