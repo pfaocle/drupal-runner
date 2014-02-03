@@ -330,6 +330,9 @@ EOS;
         } else {
             return $this->config;
         }
+
+        // Always return an array (for a valid section) and let the caller handle empty configuration.
+        return array();
     }
 
     /**
