@@ -272,7 +272,10 @@ EOS;
         }
 
         // Revert features and clear caches.
-        $this->drush('fra');
+        $featuresConfig = $this->config('Features');
+        if (!empty($featuresConfig)) {
+            $this->drush('fra');
+        }
         $this->drush('cc all');
     }
 
