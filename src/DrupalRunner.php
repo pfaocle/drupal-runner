@@ -228,16 +228,22 @@ EOS;
                 );
             }
 
-            foreach ($migrateConfig['Dependencies'] as $dependency) {
-                $this->drush("en $dependency");
+            if (isset($migrateConfig['Dependencies'])) {
+                foreach ($migrateConfig['Dependencies'] as $dependency) {
+                    $this->drush("en $dependency");
+                }
             }
 
-            foreach ($migrateConfig['Groups'] as $group) {
-                $this->drush("mi --group=$group");
+            if (isset($migrateConfig['Groups'])) {
+                foreach ($migrateConfig['Groups'] as $group) {
+                    $this->drush("mi --group=$group");
+                }
             }
 
-            foreach ($migrateConfig['Migrations'] as $migration) {
-                $this->drush("mi $migration");
+            if (isset($migrateConfig['Migrations'])) {
+                foreach ($migrateConfig['Migrations'] as $migration) {
+                    $this->drush("mi $migration");
+                }
             }
         }
     }
