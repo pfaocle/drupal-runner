@@ -380,7 +380,8 @@ EOS;
      * @param string $type
      *   The type of steps to run, either 'Pre' or 'Post'.
      */
-    protected function runSteps($type){
+    protected function runSteps($type)
+    {
         if ('Pre' == $type || 'Post' == $type) {
             $stepsConfig = $this->config($type);
 
