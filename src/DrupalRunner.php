@@ -85,6 +85,9 @@ class DrupalRunner extends \Robo\Tasks
         // Load build configuration.
         $buildConfig = $this->config('Build');
 
+        // If the sites subdirectory exists, it may have no write permissions for any user.
+        $this->taskExec("cd {$this->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
+
         // Empty the build directory.
         $this->taskExec(
             "cd {$this->path()} && rm -Rf *"
