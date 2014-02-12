@@ -30,4 +30,4 @@ Site:
 Database:
     name: d7
     user: root
-    password: password
+    password: root
