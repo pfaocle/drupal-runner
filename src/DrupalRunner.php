@@ -7,7 +7,6 @@
 namespace Robo;
 
 use Robo\Drupal\DrupalBuild;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class DrupalRunner.
@@ -23,25 +22,18 @@ class DrupalRunner extends Tasks
     protected $buildPath;
 
     /**
-     * @var array
-     *   Stores the build configuration.
+     * @var \Robo\Drupal\DrupalBuild
+     *   Stores the current build.
      */
-    protected $config = array();
-
-    /**
-     * @var bool
-     *   Whether we've already initialised a run.
-     */
-    protected $initialised;
+    protected $build;
 
     /**
      * Every task should run this first to establish we're good to run before any tasks are executed.
      */
     protected function init()
     {
-        if (!$this->initialised) {
-            $this->config();
-            $this->initialised = true;
+        if (!$this->build) {
+            $this->build = new DrupalBuild();
         }
     }
 
@@ -77,13 +69,15 @@ class DrupalRunner extends Tasks
      */
     public function drupalBuild($path)
     {
+        $this->init();
+
         if (!file_exists($path)) {
             throw new \Exception("Target directory $path does not exist.");
         }
         $this->buildPath = $path;
 
         // Load build configuration.
-        $buildConfig = $this->config('Build');
+        $buildConfig = $this->build->config('Build');
 
         // If the sites subdirectory exists, it may have no write permissions for any user.
         $this->taskExec("cd {$this->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
@@ -128,7 +122,7 @@ class DrupalRunner extends Tasks
 
     protected function sitesFileLineCallback($line)
     {
-        $buildConfig = $this->config('Build');
+        $buildConfig = $this->build->config('Build');
         return sprintf(DrupalBuild::$sitesFileLinePattern, $line, $buildConfig['sites-subdir']);
     }
 
@@ -139,7 +133,8 @@ class DrupalRunner extends Tasks
      */
     public function drupalInstall()
     {
-        $config = $this->config();
+        $this->init();
+        $config = $this->build->config();
         $site = $config['Site'];
         $db = $config['Database'];
 
@@ -181,6 +176,7 @@ EOS;
      */
     public function drupalPre()
     {
+        $this->init();
         $this->runSteps('Pre');
     }
 
@@ -191,7 +187,8 @@ EOS;
      */
     public function drupalFeatures()
     {
-        foreach ($this->config('Features') as $feature) {
+        $this->init();
+        foreach ($this->build->config('Features') as $feature) {
             $this->drush("en $feature");
         }
     }
@@ -203,8 +200,10 @@ EOS;
      */
     public function drupalTheme()
     {
+        $this->init();
+
         // Enable theme, if set.
-        $siteConfig = $this->config('Site');
+        $siteConfig = $this->build->config('Site');
         if (isset($siteConfig['theme'])) {
             $this->drush("en {$siteConfig['theme']}");
             $this->drush("vset theme_default {$siteConfig['theme']}", false);
@@ -219,7 +218,8 @@ EOS;
      */
     public function drupalMigrate()
     {
-        $migrateConfig = $this->config('Migrate');
+        $this->init();
+        $migrateConfig = $this->build->config('Migrate');
 
         if (!empty($migrateConfig)) {
             // We assume we'll want both Migrate UI and Migrate modules.
@@ -258,6 +258,7 @@ EOS;
      */
     public function drupalPost()
     {
+        $this->init();
         $this->runSteps('Post');
     }
 
@@ -275,7 +276,7 @@ EOS;
         }
 
         // Revert features and clear caches.
-        $featuresConfig = $this->config('Features');
+        $featuresConfig = $this->build->config('Features');
         if (!empty($featuresConfig)) {
             $this->drush('fra');
         }
@@ -295,7 +296,7 @@ EOS;
     protected function drush($command, $force = true)
     {
         $drushCmd = ($force ? 'drush -y' : 'drush');
-        $buildConfig = $this->config('Build');
+        $buildConfig = $this->build->config('Build');
         if (array_key_exists('drush-alias', $buildConfig)) {
             $drushCmd .= ' ' . $buildConfig['drush-alias'];
         }
@@ -311,56 +312,6 @@ EOS;
             }
             throw new \Exception(sprintf('The Drush command "%s" was not successful.', $shortCmd));
         }
-    }
-
-    /**
-     * Loads and returns the build configuration.
-     *
-     * @param string $section
-     *   The section of configuration to load/return.
-     * @param bool $refresh
-     *   Load in config from file.
-     *
-     * @return array
-     *   Parsed YAML configuration for $section, or the full configuration if $section not set.
-     *
-     * @throws \Exception
-     */
-    protected function config($section = '', $refresh = false)
-    {
-        $validConfig = array(
-            'Build',
-            'Site',
-            'Database',
-            'Pre',
-            'Features',
-            'Migrate',
-            'Post',
-        );
-
-        if (!empty($section) && !in_array($section, $validConfig)) {
-            throw new \Exception($section . ' is not a valid build configuration section,');
-        }
-
-        // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
-        if ($refresh || empty($this->config)) {
-            $configFile = getcwd() . '/drupal.build.yml';
-            if (!file_exists($configFile)) {
-                throw new \Exception('Build configuration could not be found.');
-            }
-            $this->config = Yaml::parse(file_get_contents($configFile));
-        }
-
-        if (!empty($section)) {
-            if (array_key_exists($section, $this->config)) {
-                return $this->config[$section];
-            }
-        } else {
-            return $this->config;
-        }
-
-        // Always return an array (for a valid section) and let the caller handle empty configuration.
-        return array();
     }
 
     /**
@@ -389,7 +340,7 @@ EOS;
     protected function runSteps($type)
     {
         if ('Pre' == $type || 'Post' == $type) {
-            $stepsConfig = $this->config($type);
+            $stepsConfig = $this->build->config($type);
 
             foreach (array('Modules', 'Commands') as $section) {
                 if (isset($stepsConfig[$section])) {
