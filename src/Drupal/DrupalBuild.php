@@ -59,6 +59,12 @@ class DrupalBuild
     protected $config;
 
     /**
+     * @var string
+     *   An absolute path to the directory in which to build.
+     */
+    public $path;
+
+    /**
      * Constructor - initialise configuration.
      *
      * @param DrupalRunner $obj
@@ -121,6 +127,23 @@ class DrupalBuild
     }
 
     /**
+     * Returns an absolute path to a given relative one.
+     *
+     * @param string $path
+     *   A path relative to the build directory root. Should not start or end with a /
+     *
+     * @return string
+     *   The absolute path.
+     */
+    public function path($path = '')
+    {
+        if (empty($path)) {
+            return $this->path;
+        }
+        return $this->path . DIRECTORY_SEPARATOR . $path;
+    }
+
+    /**
      * Write the sites.php file for this build.
      */
     public function writeSitesPhpFile()
@@ -128,7 +151,7 @@ class DrupalBuild
         $buildConfig = $this->config('Build');
 
         if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
-            $sitesFilePath = $this->runner->path('sites/sites.php');
+            $sitesFilePath = $this->path('sites/sites.php');
             // @todo Template?
             file_put_contents($sitesFilePath, "<?php\n  %sites");
             $t = $this->runner->roboTask('ReplaceInFile', array($sitesFilePath));

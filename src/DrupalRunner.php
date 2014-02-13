@@ -16,12 +16,6 @@ use Robo\Drupal\DrupalBuild;
 class DrupalRunner extends Tasks
 {
     /**
-     * @var string
-     *   An absolute path to the directory in which to build.
-     */
-    protected $buildPath;
-
-    /**
      * @var \Robo\Drupal\DrupalBuild
      *   Stores the current build.
      */
@@ -74,20 +68,20 @@ class DrupalRunner extends Tasks
         if (!file_exists($path)) {
             throw new \Exception("Target directory $path does not exist.");
         }
-        $this->buildPath = $path;
+        $this->build->path = $path;
 
         // Load build configuration.
         $buildConfig = $this->build->config('Build');
 
         // If the sites subdirectory exists, it may have no write permissions for any user.
-        $this->taskExec("cd {$this->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
+        $this->taskExec("cd {$this->build->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
 
         // Empty the build directory.
         $this->taskExec(
-            "cd {$this->path()} && rm -Rf *"
+            "cd {$this->build->path()} && rm -Rf *"
         )->run();
         $this->taskExec(
-            "cd {$this->path()} && rm -f " . implode(' ', DrupalBuild::$drupalHiddenFiles)
+            "cd {$this->build->path()} && rm -f " . implode(' ', DrupalBuild::$drupalHiddenFiles)
         )->run();
 
         // @todo This errors:
@@ -97,7 +91,7 @@ class DrupalRunner extends Tasks
 
         // Clone the Git repository.
         $this->taskExec(
-            "git clone {$buildConfig['git']} {$this->path('sites/' . $buildConfig['sites-subdir'])}"
+            "git clone {$buildConfig['git']} {$this->build->path('sites/' . $buildConfig['sites-subdir'])}"
         )->run();
 
         // Drush make.
@@ -105,7 +99,7 @@ class DrupalRunner extends Tasks
         // Note that we need to change directory here, so don't wrap the path to make file in a call to path(). We also
         // avoid using $this->drush() as currently this is run on the host machine.
         $this->taskExec(
-            "cd {$this->path()} && drush -y make sites/{$buildConfig['sites-subdir']}/{$buildConfig['make']} ."
+            "cd {$this->build->path()} && drush -y make sites/{$buildConfig['sites-subdir']}/{$buildConfig['make']} ."
         )->run();
 
         $this->build->writeSitesPhpFile();
@@ -144,13 +138,13 @@ EOS;
 
         // Write the inclusion of environment specific configuration to main settings.php file.
         $settingsFile = "sites/{$config['Build']['sites-subdir']}/settings.php";
-        $this->taskExec("chmod u+w {$this->path($settingsFile)}")->run();
+        $this->taskExec("chmod u+w {$this->build->path($settingsFile)}")->run();
         file_put_contents(
-            $this->path($settingsFile),
+            $this->build->path($settingsFile),
             $envSettings,
             FILE_APPEND
         );
-        $this->taskExec("chmod u-w {$this->path($settingsFile)}")->run();
+        $this->taskExec("chmod u-w {$this->build->path($settingsFile)}")->run();
     }
 
 
@@ -257,7 +251,7 @@ EOS;
         $this->init();
         // Remove unwanted files.
         foreach (DrupalBuild::$unwantedFilesPatterns as $pattern) {
-            $this->taskExec("rm -R {$this->path($pattern)}")->run();
+            $this->taskExec("rm -R {$this->build->path($pattern)}")->run();
         }
 
         // Revert features and clear caches.
@@ -297,23 +291,6 @@ EOS;
             }
             throw new \Exception(sprintf('The Drush command "%s" was not successful.', $shortCmd));
         }
-    }
-
-    /**
-     * Returns an absolute path to a given relative one.
-     *
-     * @param string $path
-     *   A path relative to the build directory root. Should not start or end with a /
-     *
-     * @return string
-     *   The absolute path.
-     */
-    public function path($path = '')
-    {
-        if (empty($path)) {
-            return $this->buildPath;
-        }
-        return $this->buildPath . DIRECTORY_SEPARATOR . $path;
     }
 
     /**
