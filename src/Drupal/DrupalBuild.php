@@ -6,6 +6,8 @@
 
 namespace Robo\Drupal;
 
+use Robo\DrupalRunner;
+use Robo\Task\ReplaceInFileTask;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -45,6 +47,12 @@ class DrupalBuild
     public static $drupalDefaultTheme = 'bartik';
 
     /**
+     * @var \Robo\DrupalRunner
+     *   Stores the calling DrupalRunner instance.
+     */
+    protected $runner;
+
+    /**
      * @var array
      *   Stores the build configuration.
      */
@@ -52,9 +60,13 @@ class DrupalBuild
 
     /**
      * Constructor - initialise configuration.
+     *
+     * @param DrupalRunner $obj
+     *   The calling DrupalRunner instance.
      */
-    public function __construct()
+    public function __construct(DrupalRunner $obj)
     {
+        $this->runner = $obj;
         $this->config();
     }
 
@@ -106,5 +118,40 @@ class DrupalBuild
 
         // Always return an array (for a valid section) and let the caller handle empty configuration.
         return array();
+    }
+
+    /**
+     * Write the sites.php file for this build.
+     */
+    public function writeSitesPhpFile()
+    {
+        $buildConfig = $this->config('Build');
+
+        if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
+            $sitesFilePath = $this->runner->path('sites/sites.php');
+            // @todo Template?
+            file_put_contents($sitesFilePath, "<?php\n  %sites");
+            $t = $this->runner->roboTask('ReplaceInFile', array($sitesFilePath));
+            if ($t instanceof ReplaceInFileTask) {
+                $t->from('%sites')
+                    ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
+                    ->run();
+            }
+        }
+    }
+
+    /**
+     * Helper to generate a line for sites.php file.
+     *
+     * @param string $hostnamePattern
+     *   The hostname pattern to map to this build's site subdirectory.
+     *
+     * @return string
+     *   The corresponding line for sites.php
+     */
+    protected function sitesFileLineCallback($hostnamePattern)
+    {
+        $buildConfig = $this->config('Build');
+        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $buildConfig['sites-subdir']);
     }
 }

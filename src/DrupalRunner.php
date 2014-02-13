@@ -33,7 +33,7 @@ class DrupalRunner extends Tasks
     protected function init()
     {
         if (!$this->build) {
-            $this->build = new DrupalBuild();
+            $this->build = new DrupalBuild($this);
         }
     }
 
@@ -108,22 +108,7 @@ class DrupalRunner extends Tasks
             "cd {$this->path()} && drush -y make sites/{$buildConfig['sites-subdir']}/{$buildConfig['make']} ."
         )->run();
 
-        // Write $sites.php file.
-        if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
-            $sitesFilePath = $this->path('sites/sites.php');
-            // @todo Template?
-            file_put_contents($sitesFilePath, "<?php\n  %sites");
-            $this->taskReplaceInFile($sitesFilePath)
-                ->from('%sites')
-                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
-                ->run();
-        }
-    }
-
-    protected function sitesFileLineCallback($line)
-    {
-        $buildConfig = $this->build->config('Build');
-        return sprintf(DrupalBuild::$sitesFileLinePattern, $line, $buildConfig['sites-subdir']);
+        $this->build->writeSitesPhpFile();
     }
 
     /**
@@ -323,7 +308,7 @@ EOS;
      * @return string
      *   The absolute path.
      */
-    protected function path($path = '')
+    public function path($path = '')
     {
         if (empty($path)) {
             return $this->buildPath;
@@ -351,6 +336,43 @@ EOS;
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Allow a DrupalBuild instance to run some protected DrupalRunner (Robo) methods.
+     *
+     * @param string $task
+     *   The Robo task name. Can be one of 'Exec' or 'ReplaceInFile'.
+     * @param array $args
+     *   @todo
+     *
+     * @return \Robo\Task\TaskInterface
+     *   Instance implementing TaskInterface from the Robo task.
+     *
+     * @throws \Exception
+     */
+    public function roboTask($task, $args = array())
+    {
+        $allowedTasks = array(
+            'Exec' => 1,
+            'ReplaceInFile' => 1,
+        );
+
+        if (array_key_exists($task, $allowedTasks)) {
+            $methodName = 'task' . $task;
+            if (method_exists($this, $methodName)) {
+                // @todo Better argument handling.
+                if (empty($args)) {
+                    return $this->$methodName();
+                } else {
+                    return $this->$methodName($args[0]);
+                }
+            } else {
+                throw new \Exception(sprintf('Method %s was not found in class %s', $methodName, __CLASS__));
+            }
+        } else {
+            throw new \Exception(sprintf('The task %s is not permitted.', $task));
         }
     }
 }
