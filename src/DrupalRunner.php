@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @package Robo
  */
-class DrupalRunner extends \Robo\Tasks
+class DrupalRunner extends Tasks
 {
     /**
      * @var string
