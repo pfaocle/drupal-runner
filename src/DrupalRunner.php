@@ -126,25 +126,7 @@ class DrupalRunner extends Tasks
                     --account-pass={$site['rootpassword']}";
         $this->drush($cmd);
 
-        // Include settings.$env.php
-        $env = 'local';
-        $envSettings = <<<EOS
-
-// Include environment specific settings.
-if (file_exists(conf_path() . '/settings.$env.php')) {
-  include_once 'settings.$env.php';
-}
-EOS;
-
-        // Write the inclusion of environment specific configuration to main settings.php file.
-        $settingsFile = "sites/{$config['Build']['sites-subdir']}/settings.php";
-        $this->taskExec("chmod u+w {$this->build->path($settingsFile)}")->run();
-        file_put_contents(
-            $this->build->path($settingsFile),
-            $envSettings,
-            FILE_APPEND
-        );
-        $this->taskExec("chmod u-w {$this->build->path($settingsFile)}")->run();
+        $this->build->writeEnvironmentSettings();
     }
 
 
@@ -321,15 +303,15 @@ EOS;
      *
      * @param string $task
      *   The Robo task name. Can be one of 'Exec' or 'ReplaceInFile'.
-     * @param array $args
-     *   @todo
+     * @param array $arg
+     *   A single argument to pass to the task.
      *
      * @return \Robo\Task\TaskInterface
      *   Instance implementing TaskInterface from the Robo task.
      *
      * @throws \Exception
      */
-    public function roboTask($task, $args = array())
+    public function roboTask($task, $arg)
     {
         $allowedTasks = array(
             'Exec' => 1,
@@ -340,10 +322,10 @@ EOS;
             $methodName = 'task' . $task;
             if (method_exists($this, $methodName)) {
                 // @todo Better argument handling.
-                if (empty($args)) {
+                if (empty($arg)) {
                     return $this->$methodName();
                 } else {
-                    return $this->$methodName($args[0]);
+                    return $this->$methodName($arg);
                 }
             } else {
                 throw new \Exception(sprintf('Method %s was not found in class %s', $methodName, __CLASS__));

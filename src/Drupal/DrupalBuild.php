@@ -154,7 +154,7 @@ class DrupalBuild
             $sitesFilePath = $this->path('sites/sites.php');
             // @todo Template?
             file_put_contents($sitesFilePath, "<?php\n  %sites");
-            $t = $this->runner->roboTask('ReplaceInFile', array($sitesFilePath));
+            $t = $this->runner->roboTask('ReplaceInFile', $sitesFilePath);
             if ($t instanceof ReplaceInFileTask) {
                 $t->from('%sites')
                     ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
@@ -176,5 +176,34 @@ class DrupalBuild
     {
         $buildConfig = $this->config('Build');
         return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $buildConfig['sites-subdir']);
+    }
+
+    /**
+     * Write to settings.php to include any environment specific settings files.
+     */
+    public function writeEnvironmentSettings()
+    {
+        $buildConfig = $this->config('Build');
+
+        // Include settings.$env.php
+        $env = 'local';
+        $envSettings = <<<EOS
+
+// Include environment specific settings.
+if (file_exists(conf_path() . '/settings.$env.php')) {
+  include_once 'settings.$env.php';
+}
+EOS;
+
+        // Write the inclusion of environment specific configuration to main settings.php file.
+        $settingsFile = "sites/{$buildConfig['sites-subdir']}/settings.php";
+        $this->runner->roboTask('Exec', "chmod u+w {$this->path($settingsFile)}")->run();
+        // @todo The following will not output any status.
+        file_put_contents(
+            $this->path($settingsFile),
+            $envSettings,
+            FILE_APPEND
+        );
+        $this->runner->roboTask('Exec', "chmod u-w {$this->path($settingsFile)}")->run();
     }
 }
