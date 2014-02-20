@@ -20,6 +20,12 @@ class DrushTask implements Task\TaskInterface
     protected $command;
 
     /**
+     * @var bool
+     *   Whether to force the command with -f
+     */
+    protected $force;
+
+    /**
      * Constructor.
      *
      * @param $command
@@ -28,6 +34,18 @@ class DrushTask implements Task\TaskInterface
     public function __construct($command)
     {
         $this->command = $command;
+    }
+
+    /**
+     * Set the command to be forced with -y
+     *
+     * @return $this
+     *   Return this instance for command chaining.
+     */
+    public function force()
+    {
+        $this->force = true;
+        return $this;
     }
 
     /**
