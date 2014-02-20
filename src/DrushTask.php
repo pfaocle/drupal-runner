@@ -20,6 +20,12 @@ class DrushTask implements Task\TaskInterface
     protected $command;
 
     /**
+     * @var string
+     *   Store the alias on which to run the command.
+     */
+    protected $alias;
+
+    /**
      * @var bool
      *   Whether to force the command with -f
      */
@@ -30,10 +36,13 @@ class DrushTask implements Task\TaskInterface
      *
      * @param $command
      *   Drush command to be run.
+     * @param string $alias
+     *   Drush alias to use. Optional.
      */
-    public function __construct($command)
+    public function __construct($command, $alias = '')
     {
         $this->command = $command;
+        $this->alias = $alias;
     }
 
     /**
