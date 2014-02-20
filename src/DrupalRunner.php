@@ -15,6 +15,8 @@ use Robo\Drupal\DrupalBuild;
  */
 class DrupalRunner extends Tasks
 {
+    use Drush;
+
     /**
      * @var \Robo\Drupal\DrupalBuild
      *   Stores the current build.
