@@ -6,6 +6,8 @@
 
 namespace Robo;
 
+use Robo\Task\Exec;
+
 /**
  * Class DrushTask.
  *
@@ -13,6 +15,8 @@ namespace Robo;
  */
 class DrushTask implements Task\TaskInterface
 {
+    use Exec;
+
     /**
      * @var string
      *   Store the Drush command to be run.
@@ -65,7 +69,15 @@ class DrushTask implements Task\TaskInterface
      */
     public function run()
     {
-        var_dump('Will run Drush command: ' . $this->command);
+        $drushCmd = ($this->force ? 'drush -y' : 'drush');
+        if ($this->alias) {
+            $drushCmd .= ' ' . $this->alias;
+        }
+
+        // @todo Where does the output go when using Drush aliases/remotes?
+        // @todo Look at $ret; handle failures (see old drush method).
+        $ret = $this->taskExec("$drushCmd $this->command")->run();
+        // @todo Proper return Result.
         return Result::success($this, "Ran Drush command: " . $this->command);
     }
 }
