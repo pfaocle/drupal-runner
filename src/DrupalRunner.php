@@ -79,7 +79,11 @@ class DrupalRunner extends Tasks
         $this->taskExec("cd {$this->build->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
 
         // Empty the build directory.
-        $this->taskCleanDir([$this->build->path()])->run();
+        // @todo This errors, sometimes:
+        //$this->taskCleanDir([$this->build->path()])->run();
+        $this->taskExec(
+            "cd {$this->build->path()} && rm -Rf *"
+        )->run();
         $this->taskExec(
             "cd {$this->build->path()} && rm -f " . implode(' ', DrupalBuild::$drupalHiddenFiles)
         )->run();
