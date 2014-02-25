@@ -6,6 +6,7 @@
 
 namespace Robo;
 
+use Robo\Drupal\DrupalBuild;
 use Robo\Task\Exec;
 
 /**
@@ -40,13 +41,17 @@ class DrushTask implements Task\TaskInterface
      *
      * @param $command
      *   Drush command to be run.
-     * @param string $alias
-     *   Drush alias to use. Optional.
+     * @param DrupalBuild $build
+     *   Pass in the current Drupal build to obtain any required configuration.
      */
-    public function __construct($command, $alias = '')
+    public function __construct($command, DrupalBuild $build)
     {
         $this->command = $command;
-        $this->alias = $alias;
+
+        $buildConfig = $build->config('Build');
+        if (array_key_exists('drush-alias', $buildConfig)) {
+            $this->alias = $buildConfig['drush-alias'];
+        }
     }
 
     /**

@@ -127,11 +127,9 @@ class DrupalRunner extends Tasks
                     --account-name={$site['rootuser']} \\
                     --account-pass={$site['rootpassword']}";
 
-        if (array_key_exists('drush-alias', $config['Build'])) {
-            $alias = $config['Build']['drush-alias'];
-        }
-
-        $this->taskDrushCommand($cmd, $alias)->run();
+        $this->taskDrushCommand($cmd, $this->build)
+            ->force()
+            ->run();
 
         $this->build->writeEnvironmentSettings();
     }
