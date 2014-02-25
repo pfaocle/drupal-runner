@@ -170,7 +170,7 @@ class DrupalRunner extends Tasks
             $this->taskDrushCommand("en {$siteConfig['theme']}", $this->build)
                 ->force()
                 ->run();
-            $this->taskDrushCommand("vset theme_default {$siteConfig['theme']}")
+            $this->taskDrushCommand("vset theme_default {$siteConfig['theme']}", $this->build)
                 ->run();
             $this->taskDrushCommand('dis ' . DrupalBuild::$drupalDefaultTheme, $this->build)
                 ->force()
