@@ -155,7 +155,9 @@ class DrupalRunner extends Tasks
     {
         $this->init();
         foreach ($this->build->config('Features') as $feature) {
-            $this->drush("en $feature");
+            $this->taskDrushCommand("en $feature", $this->build)
+                ->force()
+                ->run();
         }
     }
 
@@ -171,9 +173,14 @@ class DrupalRunner extends Tasks
         // Enable theme, if set.
         $siteConfig = $this->build->config('Site');
         if (isset($siteConfig['theme'])) {
-            $this->drush("en {$siteConfig['theme']}");
-            $this->drush("vset theme_default {$siteConfig['theme']}", false);
-            $this->drush('dis ' . DrupalBuild::$drupalDefaultTheme);
+            $this->taskDrushCommand("en {$siteConfig['theme']}", $this->build)
+                ->force()
+                ->run();
+            $this->taskDrushCommand("vset theme_default {$siteConfig['theme']}")
+                ->run();
+            $this->taskDrushCommand('dis ' . DrupalBuild::$drupalDefaultTheme, $this->build)
+                ->force()
+                ->run();
         }
     }
 
@@ -189,29 +196,38 @@ class DrupalRunner extends Tasks
 
         if (!empty($migrateConfig)) {
             // We assume we'll want both Migrate UI and Migrate modules.
-            $this->drush('en migrate_ui');
+            $this->taskDrushCommand('en migrate_ui', $this->build)
+                ->force()
+                ->run();
             if (isset($migrateConfig['Source']['Files'])) {
-                $this->drush(
-                    "vset {$migrateConfig['Source']['Files']['variable']} \\
-                        \"{$migrateConfig['Source']['Files']['dir']}\""
-                );
+                $cmd = "vset {$migrateConfig['Source']['Files']['variable']} \\
+                        \"{$migrateConfig['Source']['Files']['dir']}\"";
+                $this->taskDrushCommand($cmd, $this->build)
+                    ->force()
+                    ->run();
             }
 
             if (isset($migrateConfig['Dependencies'])) {
                 foreach ($migrateConfig['Dependencies'] as $dependency) {
-                    $this->drush("en $dependency");
+                    $this->taskDrushCommand("en $dependency", $this->build)
+                        ->force()
+                        ->run();
                 }
             }
 
             if (isset($migrateConfig['Groups'])) {
                 foreach ($migrateConfig['Groups'] as $group) {
-                    $this->drush("mi --group=$group");
+                    $this->taskDrushCommand("mi --group=$group", $this->build)
+                        ->force()
+                        ->run();
                 }
             }
 
             if (isset($migrateConfig['Migrations'])) {
                 foreach ($migrateConfig['Migrations'] as $migration) {
-                    $this->drush("mi $migration");
+                    $this->taskDrushCommand("mi $migration", $this->build)
+                        ->force()
+                        ->run();
                 }
             }
         }
@@ -244,40 +260,13 @@ class DrupalRunner extends Tasks
         // Revert features and clear caches.
         $featuresConfig = $this->build->config('Features');
         if (!empty($featuresConfig)) {
-            $this->drush('fra');
+            $this->taskDrushCommand('fra', $this->build)
+                ->force()
+                ->run();
         }
-        $this->drush('cc all');
-    }
-
-    /**
-     * Run a Drush command on the remote specified in configuration.
-     *
-     * @param string $command
-     *   Drush command to run, complete with arguments.
-     * @param bool $force
-     *   Whether to force the command with '-y'.
-     *
-     * @throws \Exception
-     */
-    protected function drush($command, $force = true)
-    {
-        $drushCmd = ($force ? 'drush -y' : 'drush');
-        $buildConfig = $this->build->config('Build');
-        if (array_key_exists('drush-alias', $buildConfig)) {
-            $drushCmd .= ' ' . $buildConfig['drush-alias'];
-        }
-        // @todo Where does the output go when using Drush aliases/remotes?
-        $ret = $this->taskExec("$drushCmd $command")->run();
-
-        // Any non-zero exit status should be handled here.
-        if ($ret) {
-            // Clean up the output a bit...
-            $shortCmd = str_replace("\n", '', preg_replace('/\s+/', ' ', $command));
-            if (strlen($shortCmd) > 50) {
-                $shortCmd = substr($shortCmd, 0, 50) . '...';
-            }
-            throw new \Exception(sprintf('The Drush command "%s" was not successful.', $shortCmd));
-        }
+        $this->taskDrushCommand('cc all', $this->build)
+            ->force()
+            ->run();
     }
 
     /**
@@ -294,9 +283,10 @@ class DrupalRunner extends Tasks
             foreach (array('Modules', 'Commands') as $section) {
                 if (isset($stepsConfig[$section])) {
                     foreach ($stepsConfig[$section] as $arg) {
-                        $this->drush(
-                            ('Modules' == $section ? 'en ' : '') . $arg
-                        );
+                        $cmd = ('Modules' == $section ? 'en ' : '') . $arg;
+                        $this->taskDrushCommand($cmd, $this->build)
+                            ->force()
+                            ->run();
                     }
                 }
             }
