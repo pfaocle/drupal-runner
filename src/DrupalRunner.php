@@ -85,9 +85,10 @@ class DrupalRunner extends Tasks
         )->run();
 
         // Clone the Git repository.
-        $this->taskExec(
-            "git clone {$buildConfig['git']} {$this->build->path('sites/' . $buildConfig['sites-subdir'])}"
-        )->run();
+        $path = $this->build->path('sites/' . $buildConfig['sites-subdir']);
+        $this->taskGit()
+            ->cloneRepo($buildConfig['git'], $path)
+            ->run();
 
         // Drush make.
         //
