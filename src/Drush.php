@@ -6,6 +6,8 @@
 
 namespace Robo;
 
+use Robo\Drupal\DrupalBuild;
+
 /**
  * Trait Drush.
  *
@@ -18,14 +20,14 @@ trait Drush
      *
      * @param $command
      *   The Drush command to run.
-     * @param string $alias
-     *   Drush alias to use. Optional.
+     * @param DrupalBuild $build
+     *   Pass in the current Drupal build to obtain any required configuration.
      *
      * @return DrushTask
      *   A new DrushTask object ready to run.
      */
-    function taskDrushCommand($command, $alias = '')
+    function taskDrushCommand($command, DrupalBuild $build)
     {
-        return new DrushTask($command, $alias);
+        return new DrushTask($command, $build);
     }
 }
