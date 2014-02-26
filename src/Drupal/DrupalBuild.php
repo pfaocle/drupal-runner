@@ -151,8 +151,12 @@ class DrupalBuild
 
         if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
             $sitesFilePath = $this->path('sites/sites.php');
-            // @todo Template?
-            file_put_contents($sitesFilePath, "<?php\n  %sites");
+
+            // @todo Template, or combine these two tasks into one write?
+            $this->taskWriteToFile($sitesFilePath)
+                ->text("<?php\n  %sites")
+                ->run();
+
             $this->taskReplaceInFile($sitesFilePath)
                 ->from('%sites')
                 ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
@@ -201,6 +205,13 @@ EOS;
             $envSettings,
             FILE_APPEND
         );
+
+        // @todo the append() magic method doesn't work...
+//        $this->taskWriteToFile($this->path($settingsFile))
+//            ->text($envSettings)
+//            ->append()
+//            ->run();
+
         $this->taskExec("chmod u-w {$this->path($settingsFile)}")->run();
     }
 }
