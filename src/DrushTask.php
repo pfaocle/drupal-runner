@@ -6,8 +6,10 @@
 
 namespace Robo;
 
+use Robo\Output;
 use Robo\Drupal\DrupalBuild;
 use Robo\Task\Exec;
+use Robo\Task\TaskException;
 
 /**
  * Class DrushTask.
@@ -17,6 +19,7 @@ use Robo\Task\Exec;
 class DrushTask implements Task\TaskInterface
 {
     use Exec;
+    use Output;
 
     /**
      * @var string
@@ -71,6 +74,8 @@ class DrushTask implements Task\TaskInterface
      *
      * @return Result
      *   Result data.
+     *
+     * @throws Task\TaskException
      */
     public function run()
     {
@@ -80,9 +85,19 @@ class DrushTask implements Task\TaskInterface
         }
 
         // @todo Where does the output go when using Drush aliases/remotes?
-        // @todo Look at $ret; handle failures (see old drush method).
         $ret = $this->taskExec("$drushCmd $this->command")->run();
-        // @todo Proper return Result.
+
+        // The above will error and display a message, however we should also check the return status and throw
+        // a TaskException to halt the process if the caller doesn't catch and handle it.
+        if (!$ret->wasSuccessful()) {
+            // Clean up the output a bit...
+            $shortCmd = str_replace("\n", '', preg_replace('/\s+/', ' ', $this->command));
+            if (strlen($shortCmd) > 50) {
+                $shortCmd = substr($shortCmd, 0, 50) . '...';
+            }
+            throw new TaskException($this, "The Drush command $shortCmd was not successful.");
+        }
+
         return Result::success($this, "Ran Drush command: " . $this->command);
     }
 }
