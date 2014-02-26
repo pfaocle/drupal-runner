@@ -72,21 +72,9 @@ class DrupalRunner extends Tasks
         }
         $this->build->path = $path;
 
-        // Load build configuration.
+        // Load build configuration and then empty target directory.
         $buildConfig = $this->build->config('Build');
-
-        // If the sites subdirectory exists, it may have no write permissions for any user.
-        $this->taskExec("cd {$this->build->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
-
-        // Empty the build directory.
-        // @todo This errors, sometimes:
-        //$this->taskCleanDir([$this->build->path()])->run();
-        $this->taskExec(
-            "cd {$this->build->path()} && rm -Rf *"
-        )->run();
-        $this->taskExec(
-            "cd {$this->build->path()} && rm -f " . implode(' ', DrupalBuild::$drupalHiddenFiles)
-        )->run();
+        $this->build->cleanBuildDirectory();
 
         // Clone the Git repository.
         $path = $this->build->path('sites/' . $buildConfig['sites-subdir']);

@@ -214,4 +214,25 @@ EOS;
 
         $this->taskExec("chmod u-w {$this->path($settingsFile)}")->run();
     }
+
+    /**
+     * Empty the build directory completely.
+     */
+    public function cleanBuildDirectory()
+    {
+        $buildConfig = $this->config('Build');
+
+        // If the sites subdirectory exists, it may have no write permissions for any user.
+        $this->taskExec("cd {$this->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
+
+        // Empty the build directory.
+        // @todo This errors, sometimes:
+        //$this->taskCleanDir([$this->path()])->run();
+        $this->taskExec(
+            "cd {$this->path()} && rm -Rf *"
+        )->run();
+        $this->taskExec(
+            "cd {$this->path()} && rm -f " . implode(' ', self::$drupalHiddenFiles)
+        )->run();
+    }
 }
