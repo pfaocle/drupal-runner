@@ -6,8 +6,8 @@
 
 namespace Robo\Drupal;
 
-use Robo\DrupalRunner;
-use Robo\Task\ReplaceInFileTask;
+use Robo\Task\Exec;
+use Robo\Task\FileSystem;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -17,6 +17,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DrupalBuild
 {
+    use Exec;
+    use FileSystem;
+
     /**
      * @var array
      *   A list of Drupal's hidden files (to remove).
@@ -66,13 +69,9 @@ class DrupalBuild
 
     /**
      * Constructor - initialise configuration.
-     *
-     * @param DrupalRunner $obj
-     *   The calling DrupalRunner instance.
      */
-    public function __construct(DrupalRunner $obj)
+    public function __construct()
     {
-        $this->runner = $obj;
         $this->config();
     }
 
@@ -154,12 +153,10 @@ class DrupalBuild
             $sitesFilePath = $this->path('sites/sites.php');
             // @todo Template?
             file_put_contents($sitesFilePath, "<?php\n  %sites");
-            $t = $this->runner->roboTask('ReplaceInFile', $sitesFilePath);
-            if ($t instanceof ReplaceInFileTask) {
-                $t->from('%sites')
-                    ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
-                    ->run();
-            }
+            $this->taskReplaceInFile($sitesFilePath)
+                ->from('%sites')
+                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
+                ->run();
         }
     }
 
@@ -197,13 +194,13 @@ EOS;
 
         // Write the inclusion of environment specific configuration to main settings.php file.
         $settingsFile = "sites/{$buildConfig['sites-subdir']}/settings.php";
-        $this->runner->roboTask('Exec', "chmod u+w {$this->path($settingsFile)}")->run();
+        $this->taskExec("chmod u+w {$this->path($settingsFile)}")->run();
         // @todo The following will not output any status.
         file_put_contents(
             $this->path($settingsFile),
             $envSettings,
             FILE_APPEND
         );
-        $this->runner->roboTask('Exec', "chmod u-w {$this->path($settingsFile)}")->run();
+        $this->taskExec("chmod u-w {$this->path($settingsFile)}")->run();
     }
 }

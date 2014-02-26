@@ -29,7 +29,7 @@ class DrupalRunner extends Tasks
     protected function init()
     {
         if (!$this->build) {
-            $this->build = new DrupalBuild($this);
+            $this->build = new DrupalBuild();
         }
     }
 
@@ -288,43 +288,6 @@ class DrupalRunner extends Tasks
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Allow a DrupalBuild instance to run some protected DrupalRunner (Robo) methods.
-     *
-     * @param string $task
-     *   The Robo task name. Can be one of 'Exec' or 'ReplaceInFile'.
-     * @param array $arg
-     *   A single argument to pass to the task.
-     *
-     * @return \Robo\Task\TaskInterface
-     *   Instance implementing TaskInterface from the Robo task.
-     *
-     * @throws \Exception
-     */
-    public function roboTask($task, $arg)
-    {
-        $allowedTasks = array(
-            'Exec' => 1,
-            'ReplaceInFile' => 1,
-        );
-
-        if (array_key_exists($task, $allowedTasks)) {
-            $methodName = 'task' . $task;
-            if (method_exists($this, $methodName)) {
-                // @todo Better argument handling.
-                if (empty($arg)) {
-                    return $this->$methodName();
-                } else {
-                    return $this->$methodName($arg);
-                }
-            } else {
-                throw new \Exception(sprintf('Method %s was not found in class %s', $methodName, __CLASS__));
-            }
-        } else {
-            throw new \Exception(sprintf('The task %s is not permitted.', $task));
         }
     }
 }
