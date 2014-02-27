@@ -199,18 +199,12 @@ EOS;
         // Write the inclusion of environment specific configuration to main settings.php file.
         $settingsFile = "sites/{$buildConfig['sites-subdir']}/settings.php";
         $this->taskExec("chmod u+w {$this->path($settingsFile)}")->run();
-        // @todo The following will not output any status.
-        file_put_contents(
-            $this->path($settingsFile),
-            $envSettings,
-            FILE_APPEND
-        );
 
-        // @todo the append() magic method doesn't work...
-//        $this->taskWriteToFile($this->path($settingsFile))
-//            ->text($envSettings)
-//            ->append()
-//            ->run();
+        // @todo The append() magic method requires this change: https://github.com/Codegyre/Robo/pull/11
+        $this->taskWriteToFile($this->path($settingsFile))
+            ->text($envSettings)
+            ->append()
+            ->run();
 
         $this->taskExec("chmod u-w {$this->path($settingsFile)}")->run();
     }
