@@ -197,16 +197,16 @@ if (file_exists(conf_path() . '/settings.$env.php')) {
 EOS;
 
         // Write the inclusion of environment specific configuration to main settings.php file.
-        $settingsFile = "sites/{$buildConfig['sites-subdir']}/settings.php";
-        $this->taskExec("chmod u+w {$this->path($settingsFile)}")->run();
+        $settingsFilePath = "sites/{$buildConfig['sites-subdir']}/settings.php";
+        $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
 
         // @todo The append() magic method requires this change: https://github.com/Codegyre/Robo/pull/11
-        $this->taskWriteToFile($this->path($settingsFile))
+        $this->taskWriteToFile($this->path($settingsFilePath))
             ->text($envSettings)
             ->append()
             ->run();
 
-        $this->taskExec("chmod u-w {$this->path($settingsFile)}")->run();
+        $this->taskExec("chmod u-w {$this->path($settingsFilePath)}")->run();
     }
 
     /**
@@ -217,7 +217,10 @@ EOS;
         $buildConfig = $this->config('Build');
 
         // If the sites subdirectory exists, it may have no write permissions for any user.
-        $this->taskExec("cd {$this->path()} && chmod u+w sites/{$buildConfig['sites-subdir']}")->run();
+        $sitesSubdirPath = $this->path('sites/' . $buildConfig['sites-subdir']);
+        if (file_exists($sitesSubdirPath)) {
+            $this->taskExec("cd {$this->path()} && chmod u+w $sitesSubdirPath")->run();
+        }
 
         // Empty the build directory.
         // @todo This errors, sometimes:
