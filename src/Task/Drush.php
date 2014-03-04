@@ -8,6 +8,7 @@ namespace Robo\Task;
 
 use Robo\Output;
 use Robo\Result;
+use Robo\Task\DynamicConfig;
 use Robo\Task\Exec;
 
 use Robo\Drupal\DrupalBuild;
@@ -43,6 +44,7 @@ trait Drush
  */
 class DrushTask implements TaskInterface
 {
+    use DynamicConfig;
     use Exec;
     use Output;
 
@@ -60,9 +62,12 @@ class DrushTask implements TaskInterface
 
     /**
      * @var bool
-     *   Whether to force the command with -f
+     *   Whether to force the command with -f. Note setting of this property is handled by DynamicConfig and we set
+     *   an initial value here to force the type as well as provide a default.
+     *
+     * @see Robo\Task\DynamicConfig
      */
-    protected $force;
+    protected $force = false;
 
     /**
      * Constructor.
@@ -80,18 +85,6 @@ class DrushTask implements TaskInterface
         if (array_key_exists('drush-alias', $buildConfig)) {
             $this->alias = $buildConfig['drush-alias'];
         }
-    }
-
-    /**
-     * Set the command to be forced with -y
-     *
-     * @return $this
-     *   Return this instance for command chaining.
-     */
-    public function force()
-    {
-        $this->force = true;
-        return $this;
     }
 
     /**
