@@ -1,22 +1,47 @@
 <?php
 /**
  * @file
- * Run Drush commands (in a stack?).
+ * Run Drush commands as a Robo Task.
  */
 
-namespace Robo;
+namespace Robo\Task;
 
 use Robo\Output;
-use Robo\Drupal\DrupalBuild;
+use Robo\Result;
 use Robo\Task\Exec;
-use Robo\Task\TaskException;
+
+use Robo\Drupal\DrupalBuild;
+
+/**
+ * Trait Drush.
+ *
+ * @package Robo
+ */
+trait Drush
+{
+    /**
+     * Define a task that RoboFile.php can run.
+     *
+     * @param $command
+     *   The Drush command to run.
+     * @param DrupalBuild $build
+     *   Pass in the current Drupal build to obtain any required configuration.
+     *
+     * @return DrushTask
+     *   A new DrushTask object ready to run.
+     */
+    function taskDrushCommand($command, DrupalBuild $build)
+    {
+        return new DrushTask($command, $build);
+    }
+}
 
 /**
  * Class DrushTask.
  *
  * @package Robo
  */
-class DrushTask implements Task\TaskInterface
+class DrushTask implements TaskInterface
 {
     use Exec;
     use Output;
@@ -75,7 +100,7 @@ class DrushTask implements Task\TaskInterface
      * @return Result
      *   Result data.
      *
-     * @throws Task\TaskException
+     * @throws TaskException
      */
     public function run()
     {

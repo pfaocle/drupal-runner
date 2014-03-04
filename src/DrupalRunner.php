@@ -15,7 +15,7 @@ use Robo\Drupal\DrupalBuild;
  */
 class DrupalRunner extends Tasks
 {
-    use Drush;
+    use Task\Drush;
 
     /**
      * @var \Robo\Drupal\DrupalBuild
