@@ -250,9 +250,7 @@ class DrupalRunner extends Tasks
                 ->force()
                 ->run();
         }
-        $this->taskDrushCommand('cc all', $this->build)
-            ->force()
-            ->run();
+        $this->taskDrushCommand('cc all', $this->build)->run();
     }
 
     /**
