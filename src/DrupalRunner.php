@@ -49,6 +49,7 @@ class DrupalRunner extends Tasks
     public function drupalMagic($path)
     {
         $this->drupalBuild($path);
+        $this->drupalMake();
         $this->drupalInstall();
         $this->drupalPre();
         $this->drupalFeatures();
@@ -94,21 +95,30 @@ class DrupalRunner extends Tasks
             ->cloneRepo($buildConfig['git'], $path)
             ->run();
 
-        // Drush make.
-        //
+        $this->build->writeSitesPhpFile();
+    }
+
+    /**
+     * Step 1: Drush Make
+     *
+     * @desc Run Drush Make [1]
+     */
+    public function drupalMake()
+    {
+        $this->init();
+        $buildConfig = $this->build->config('Build');
+
         // Note that we need to change directory here, so don't wrap the path to make file in a call to path(). We also
         // avoid using $this->drush() as currently this is run on the host machine.
         $this->taskExec(
             "cd {$this->build->path()} && drush -y make sites/{$buildConfig['sites-subdir']}/{$buildConfig['make']} ."
         )->run();
-
-        $this->build->writeSitesPhpFile();
     }
 
     /**
-     * Step 1: install.
+     * Step 2: install.
      *
-     * @desc Install the site profile [1]
+     * @desc Install the site profile [2]
      */
     public function drupalInstall()
     {
@@ -134,9 +144,9 @@ class DrupalRunner extends Tasks
 
 
     /**
-     * Step 2: pre-steps. Run Drush commands and enable modules - steps that should happen before anything else.
+     * Step 3: pre-steps. Run Drush commands and enable modules - steps that should happen before anything else.
      *
-     * @desc Pre-steps [2]
+     * @desc Pre-steps [3]
      */
     public function drupalPre()
     {
@@ -145,9 +155,9 @@ class DrupalRunner extends Tasks
     }
 
     /**
-     * Step 3: features.
+     * Step 4: features.
      *
-     * @desc Enable features [3]
+     * @desc Enable features [4]
      */
     public function drupalFeatures()
     {
@@ -160,9 +170,9 @@ class DrupalRunner extends Tasks
     }
 
     /**
-     * Step 4: theme. Enable theme and disable the Drupal default.
+     * Step 5: theme. Enable theme and disable the Drupal default.
      *
-     * @desc Enable theme [4]
+     * @desc Enable theme [5]
      */
     public function drupalTheme()
     {
@@ -183,9 +193,9 @@ class DrupalRunner extends Tasks
     }
 
     /**
-     * Step 5: migration.
+     * Step 6: migration.
      *
-     * @desc Run data migration [5]
+     * @desc Run data migration [6]
      */
     public function drupalMigrate()
     {
@@ -232,9 +242,9 @@ class DrupalRunner extends Tasks
     }
 
     /**
-     * Step 6: post-steps. Drush commands to run and modules to enable after everything else, but before clean-up.
+     * Step 7: post-steps. Drush commands to run and modules to enable after everything else, but before clean-up.
      *
-     * @desc Post-steps [6]
+     * @desc Post-steps [7]
      */
     public function drupalPost()
     {
@@ -243,9 +253,9 @@ class DrupalRunner extends Tasks
     }
 
     /**
-     * Step 7: cleanup.
+     * Step 8: cleanup.
      *
-     * @desc Clean up unwanted files [7]
+     * @desc Clean up unwanted files [8]
      */
     public function drupalCleanup()
     {
