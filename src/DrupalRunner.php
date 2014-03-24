@@ -90,9 +90,8 @@ class DrupalRunner extends Tasks
         $this->build->cleanBuildDirectory();
 
         // Clone the Git repository.
-        $path = $this->build->path('sites/' . $buildConfig['sites-subdir']);
         $this->taskGit()
-            ->cloneRepo($buildConfig['git'], $path)
+            ->cloneRepo($buildConfig['git'], $this->build->path($sitesSubdir))
             ->run();
 
         $this->build->writeSitesPhpFile();
