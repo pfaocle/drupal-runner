@@ -18,6 +18,11 @@ class DrupalRunner extends Tasks
     use Task\Drush;
 
     /**
+     * String used to identify when the Git working directory is clean.
+     */
+    const GIT_CLEAN_MSG = 'nothing to commit, working directory clean';
+
+    /**
      * @var \Robo\Drupal\DrupalBuild
      *   Stores the current build.
      */
@@ -72,8 +77,15 @@ class DrupalRunner extends Tasks
         }
         $this->build->path = $path;
 
-        // Load build configuration and then empty target directory.
         $buildConfig = $this->build->config('Build');
+        $sitesSubdir = 'sites/' . $buildConfig['sites-subdir'];
+
+        // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
+        // changes, given them the opportunity to quit.
+        // @todo We assume a remote named 'origin' by not passing this as the second parameter here:
+        $this->checkLocalGit($this->build->path($sitesSubdir));
+
+        // If we're this far, the user is OK with us emptying target directory and continuing.
         $this->build->cleanBuildDirectory();
 
         // Clone the Git repository.
@@ -251,6 +263,55 @@ class DrupalRunner extends Tasks
                 ->run();
         }
         $this->taskDrushCommand('cc all', $this->build)->run();
+    }
+
+    /**
+     * Do some quick checks on the local repository before proceeding.
+     *
+     * Warn the user if their Git repository is dirty or contains changes not yet pushed to the (default) remote.
+     *
+     * @param string $repositoryPath
+     *   Absolute path to the Git repository to check.
+     * @param string $remote
+     *   Name of the remote to check against. Defaults to 'origin'.
+     */
+    protected function checkLocalGit($repositoryPath, $remote = 'origin')
+    {
+        $ret = $this->taskExec("cd $repositoryPath && git status")->run();
+        if ($this::GIT_CLEAN_MSG !== $ret->getMessage()) {
+            $this->askContinueQuestion(
+                'Working directory not clean. Continuing will result in these changes being lost.',
+                'working directory not clean'
+            );
+        }
+
+        // If comparing the local branch to remote with cherry returns something other than an empty message, we have
+        // local changes not pushed to remote yet.
+        $ret = $this->taskExec("cd $repositoryPath && git cherry $remote")->run();
+        if ('' !== $ret->getMessage()) {
+            $this->askContinueQuestion(
+                "You have local changes that haven't yet been published to a remote repository." .
+                'Continuing will result in these changes being lost.',
+                'unpublished local changes'
+            );
+        }
+    }
+
+    /**
+     * Helper function to ask a 'Do you want to continue?' question.
+     *
+     * @param string $question
+     *   The question to present the user.
+     * @param string $exitMessage
+     *   A response to include in the output when not continuing.
+     */
+    protected function askContinueQuestion($question, $exitMessage)
+    {
+        $answer = $this->ask($question . ' Do you want to continue (y/n)?');
+        if ($answer != 'Y' && $answer != 'y') {
+            $this->printTaskInfo(sprintf('Cancelled by user: %s', $exitMessage));
+            exit(1);
+        }
     }
 
     /**
