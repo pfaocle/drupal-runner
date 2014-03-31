@@ -296,6 +296,10 @@ class DrupalRunner extends Tasks
 
         // If comparing the local branch to remote with cherry returns something other than an empty message, we have
         // local changes not pushed to remote yet.
+        //
+        // Note that this should also cover the case where we're on a local branch that hasn't been pushed at all,
+        // PROVIDING there are commits on the local branch. `git cherry [REMOTE]` still returns a list of local-only
+        // commits even without an upstream copy of the branch. 'Empty' local branches will be lost.
         $ret = $this->taskExec("cd $repositoryPath && git cherry $remote")->run();
         if ('' !== $ret->getMessage()) {
             $this->askContinueQuestion(
