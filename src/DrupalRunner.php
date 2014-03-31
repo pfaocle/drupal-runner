@@ -83,7 +83,9 @@ class DrupalRunner extends Tasks
 
         // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
         // changes, given them the opportunity to quit.
-        // @todo We assume a remote named 'origin' by not passing this as the second parameter here:
+        //
+        // We assume a remote named 'origin' by not passing anything as the second parameter here. This is currently
+        // acceptable as we're cloning the repository afresh each time and the remote will be named 'origin'.
         $this->checkLocalGit($this->build->path($sitesSubdir));
 
         // If we're this far, the user is OK with us emptying target directory and continuing.
