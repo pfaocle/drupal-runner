@@ -289,7 +289,7 @@ class DrupalRunner extends Tasks
     protected function checkLocalGit($repositoryPath, $remote = 'origin')
     {
         $ret = $this->taskExec("cd $repositoryPath && git status")->run();
-        if ($this::GIT_CLEAN_MSG !== $ret->getMessage()) {
+        if (!strpos($ret->getMessage(), $this::GIT_CLEAN_MSG)) {
             $this->askContinueQuestion(
                 'Working directory not clean. Continuing will result in these changes being lost.',
                 'working directory not clean'
@@ -303,7 +303,7 @@ class DrupalRunner extends Tasks
         // PROVIDING there are commits on the local branch. `git cherry [REMOTE]` still returns a list of local-only
         // commits even without an upstream copy of the branch. 'Empty' local branches will be lost.
         $ret = $this->taskExec("cd $repositoryPath && git cherry $remote")->run();
-        if ('' !== $ret->getMessage()) {
+        if ($ret->getMessage() != null) {
             $this->askContinueQuestion(
                 "You have local changes that haven't yet been published to a remote repository." .
                 'Continuing will result in these changes being lost.',

@@ -18,7 +18,7 @@ _Note:_ you may also need to also run Composer for Robo as well as your own set-
      cd vendor/codegyre/robo
      composer install
 
-Drupal Runner must currently be used with a Robo installation based on the master branch, forward of the commit at [c01841f10e](https://github.com/Codegyre/Robo/commit/c01841f10efd841a906d104ee4a60876efc861f9). See https://github.com/Codegyre/Robo/pull/11 for more details.
+Drupal Runner requires Robo 0.4.0 or greater.
 
 ### Example
 
@@ -34,7 +34,7 @@ Drupal Runner must currently be used with a Robo installation based on the maste
         ],
 
         "require": {
-            "codegyre/robo": "*",
+            "codegyre/robo": "0.4.*",
             "pfaocle/drupal-runner": "dev-master"
         }
     }

@@ -8,7 +8,8 @@ namespace Robo\Task;
 
 use Robo\Output;
 use Robo\Result;
-use Robo\Task\DynamicConfig;
+use Robo\Task\Shared\TaskInterface;
+use Robo\Task\Shared\DynamicConfig;
 use Robo\Task\Exec;
 
 use Robo\Drupal\DrupalBuild;
@@ -93,7 +94,7 @@ class DrushTask implements TaskInterface
      * @return Result
      *   Result data.
      *
-     * @throws TaskException
+     * @throws Shared\TaskException
      */
     public function run()
     {
@@ -113,7 +114,7 @@ class DrushTask implements TaskInterface
             if (strlen($shortCmd) > 50) {
                 $shortCmd = substr($shortCmd, 0, 50) . '...';
             }
-            throw new TaskException($this, "The Drush command $shortCmd was not successful.");
+            throw new Shared\TaskException($this, "The Drush command $shortCmd was not successful.");
         }
 
         return Result::success($this, "Ran Drush command: " . $this->command);
