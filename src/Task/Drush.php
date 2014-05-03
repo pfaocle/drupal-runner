@@ -106,15 +106,19 @@ class DrushTask implements TaskInterface
         // @todo Where does the output go when using Drush aliases/remotes?
         $ret = $this->taskExec("$drushCmd $this->command")->run();
 
-        // The above will error and display a message, however we should also check the return status and throw
-        // a TaskException to halt the process if the caller doesn't catch and handle it.
+        // The above will error and display a message, however we should also check the return status and give the user
+        // the option to continue. If they choose not to, we throw a TaskException to halt the process if the caller
+        // doesn't catch and handle it.
         if (!$ret->wasSuccessful()) {
-            // Clean up the output a bit...
-            $shortCmd = str_replace("\n", '', preg_replace('/\s+/', ' ', $this->command));
-            if (strlen($shortCmd) > 50) {
-                $shortCmd = substr($shortCmd, 0, 50) . '...';
+            $r = $this->ask('Drush reported an error. Do you wish to continue (y/n)?');
+            if (strtolower($r) !== 'y') {
+                // Clean up the output a bit...
+                $shortCmd = str_replace("\n", '', preg_replace('/\s+/', ' ', $this->command));
+                if (strlen($shortCmd) > 50) {
+                    $shortCmd = substr($shortCmd, 0, 50) . '...';
+                }
+                throw new Shared\TaskException($this, "The Drush command $shortCmd was not successful.");
             }
-            throw new Shared\TaskException($this, "The Drush command $shortCmd was not successful.");
         }
 
         return Result::success($this, "Ran Drush command: " . $this->command);
