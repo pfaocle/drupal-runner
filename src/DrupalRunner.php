@@ -7,6 +7,7 @@
 namespace Robo;
 
 use Robo\Drupal\DrupalBuild;
+use Robo\Task\Shared\TaskException;
 
 /**
  * Class DrupalRunner.
@@ -128,6 +129,18 @@ class DrupalRunner extends Tasks
         $site = $config['Site'];
         $db = $config['Database'];
 
+        // For database builds, we install Drupal core using the minimal profile (to handle settings.php etc), then
+        // import the source database.
+        if (isset($config['Build']['install-db'])) {
+            if (!file_exists($config['Build']['install-db'])) {
+                throw new TaskException(
+                    __CLASS__,
+                    sprintf('Source database dump %s could not be found.', $config['Build']['install-db'])
+                );
+            }
+            $config['Build']['profile'] = 'minimal';
+        }
+
         // Site install.
         $cmd = "site-install {$config['Build']['profile']} \\
                     --db-url=mysql://{$db['user']}:{$db['password']}@localhost/{$db['name']} \\
@@ -139,6 +152,14 @@ class DrupalRunner extends Tasks
         $this->taskDrushCommand($cmd, $this->build)
             ->force()
             ->run();
+
+        if (isset($config['Build']['install-db'])) {
+            // @todo Backup DB?
+
+            // Import DB. Note we assume the database dump contains 'DROP TABLE IF EXISTS' statements, otherwise we
+            // would call a Drush sql-drop here.
+            $this->taskDrushCommand('sql-cli < ' . $config['Build']['install-db'], $this->build)->force()->run();
+        }
 
         $this->build->writeEnvironmentSettings();
     }
