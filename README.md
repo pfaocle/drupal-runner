@@ -18,7 +18,7 @@ _Note:_ you may also need to also run Composer for Robo as well as your own set-
      cd vendor/codegyre/robo
      composer install
 
-Drupal Runner requires Robo 0.4.0 or greater.
+Drupal Runner requires Robo 0.4.1 or greater.
 
 ### Example
 
