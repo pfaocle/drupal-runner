@@ -156,8 +156,9 @@ class DrupalRunner extends Tasks
         if (isset($config['Build']['install-db'])) {
             // @todo Backup DB?
 
-            // Import DB. Note we assume the database dump contains 'DROP TABLE IF EXISTS' statements, otherwise we
-            // would call a Drush sql-drop here.
+            // Import DB. Note we drop the entire database here, as there could be tables in the minimal install
+            // that aren't present in the imported SQL (nor are there any DROP TABLE x IF EXISTS... statements).
+            $this->taskDrushCommand('sql-drop', $this->build)->force()->run();
             $this->taskDrushCommand('sql-cli < ' . $config['Build']['install-db'], $this->build)->force()->run();
         }
 
