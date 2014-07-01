@@ -6,6 +6,7 @@
 
 namespace Robo;
 
+use Boedah\Robo\Task\Drush;
 use Robo\Drupal\DrupalBuild;
 use Robo\Task\Shared\TaskException;
 
@@ -16,7 +17,7 @@ use Robo\Task\Shared\TaskException;
  */
 class DrupalRunner extends Tasks
 {
-    use Task\Drush;
+    use Drush;
 
     /**
      * String used to identify when the Git working directory is clean.
@@ -128,6 +129,7 @@ class DrupalRunner extends Tasks
         $config = $this->build->config();
         $site = $config['Site'];
         $db = $config['Database'];
+        $build = $config['Build'];
 
         // For database builds, we install Drupal core using the minimal profile (to handle settings.php etc), then
         // import the source database.
@@ -149,8 +151,10 @@ class DrupalRunner extends Tasks
                     --account-name={$site['rootuser']} \\
                     --account-pass={$site['rootpassword']}";
 
-        $this->taskDrushCommand($cmd, $this->build)
-            ->force()
+        $this->taskDrushStack()
+            ->drupalRootDirectory($this->build->path)
+            ->siteAlias($build['drush-alias'])
+            ->exec($cmd)
             ->run();
 
         if (isset($config['Build']['install-db'])) {
@@ -158,8 +162,12 @@ class DrupalRunner extends Tasks
 
             // Import DB. Note we drop the entire database here, as there could be tables in the minimal install
             // that aren't present in the imported SQL (nor are there any DROP TABLE x IF EXISTS... statements).
-            $this->taskDrushCommand('sql-drop', $this->build)->force()->run();
-            $this->taskDrushCommand('sql-cli < ' . $config['Build']['install-db'], $this->build)->force()->run();
+            $this->taskDrushStack()
+                ->drupalRootDirectory($this->build->path)
+                ->siteAlias($build['drush-alias'])
+                ->exec('sql-drop')
+                ->exec('sql-cli < ' . $config['Build']['install-db'])
+                ->run();
         }
 
         $this->build->writeEnvironmentSettings();
@@ -200,13 +208,13 @@ class DrupalRunner extends Tasks
         // Enable theme, if set.
         $siteConfig = $this->build->config('Site');
         if (isset($siteConfig['theme'])) {
-            $this->taskDrushCommand("en {$siteConfig['theme']}", $this->build)
-                ->force()
-                ->run();
-            $this->taskDrushCommand("vset theme_default {$siteConfig['theme']}", $this->build)
-                ->run();
-            $this->taskDrushCommand('dis ' . DrupalBuild::$drupalDefaultTheme, $this->build)
-                ->force()
+            $buildConfig = $this->build->config('Build');
+            $this->taskDrushStack()
+                ->drupalRootDirectory($this->build->path)
+                ->siteAlias($buildConfig['drush-alias'])
+                ->exec("en {$siteConfig['theme']}")
+                ->exec("vset theme_default {$siteConfig['theme']}")
+                ->exec('dis ' . DrupalBuild::$drupalDefaultTheme)
                 ->run();
         }
     }
@@ -222,38 +230,52 @@ class DrupalRunner extends Tasks
         $migrateConfig = $this->build->config('Migrate');
 
         if (!empty($migrateConfig)) {
+            $buildConfig = $this->build->config('Build');
+
             // We assume we'll want both Migrate UI and Migrate modules.
-            $this->taskDrushCommand('en migrate_ui', $this->build)
-                ->force()
+            $this->taskDrushStack()
+                ->drupalRootDirectory($this->build->path)
+                ->siteAlias($buildConfig['drush-alias'])
+                ->exec('en migrate_ui')
                 ->run();
+
             if (isset($migrateConfig['Source']['Files'])) {
                 $cmd = "vset {$migrateConfig['Source']['Files']['variable']} \\
                         \"{$migrateConfig['Source']['Files']['dir']}\"";
-                $this->taskDrushCommand($cmd, $this->build)
-                    ->force()
+                $this->taskDrushStack()
+                    ->drupalRootDirectory($this->build->path)
+                    ->siteAlias($buildConfig['drush-alias'])
+                    ->exec($cmd)
                     ->run();
+
             }
 
             if (isset($migrateConfig['Dependencies'])) {
                 foreach ($migrateConfig['Dependencies'] as $dependency) {
-                    $this->taskDrushCommand("en $dependency", $this->build)
-                        ->force()
+                    $this->taskDrushStack()
+                        ->drupalRootDirectory($this->build->path)
+                        ->siteAlias($buildConfig['drush-alias'])
+                        ->exec("en $dependency")
                         ->run();
                 }
             }
 
             if (isset($migrateConfig['Groups'])) {
                 foreach ($migrateConfig['Groups'] as $group) {
-                    $this->taskDrushCommand("mi --group=$group", $this->build)
-                        ->force()
+                    $this->taskDrushStack()
+                        ->drupalRootDirectory($this->build->path)
+                        ->siteAlias($buildConfig['drush-alias'])
+                        ->exec("mi --group=$group")
                         ->run();
                 }
             }
 
             if (isset($migrateConfig['Migrations'])) {
                 foreach ($migrateConfig['Migrations'] as $migration) {
-                    $this->taskDrushCommand("mi $migration", $this->build)
-                        ->force()
+                    $this->taskDrushStack()
+                        ->drupalRootDirectory($this->build->path)
+                        ->siteAlias($buildConfig['drush-alias'])
+                        ->exec("mi $migration")
                         ->run();
                 }
             }
@@ -286,12 +308,19 @@ class DrupalRunner extends Tasks
 
         // Revert features and clear caches.
         $featuresConfig = $this->build->config('Features');
+        $buildConfig = $this->build->config('Build');
         if (!empty($featuresConfig)) {
-            $this->taskDrushCommand('fra', $this->build)
-                ->force()
+            $this->taskDrushStack()
+                ->drupalRootDirectory($this->build->path)
+                ->siteAlias($buildConfig['drush-alias'])
+                ->revertAllFeatures()
                 ->run();
         }
-        $this->taskDrushCommand('cc all', $this->build)->run();
+        $this->taskDrushStack()
+            ->drupalRootDirectory($this->build->path)
+            ->siteAlias($buildConfig['drush-alias'])
+            ->clearCache()
+            ->run();
     }
 
     /**
@@ -357,14 +386,16 @@ class DrupalRunner extends Tasks
     {
         if ('Pre' == $type || 'Post' == $type) {
             $stepsConfig = $this->build->config($type);
-
             if (isset($stepsConfig['Modules'])) {
                 $this->enableModuleList($stepsConfig['Modules']);
             }
             if (isset($stepsConfig["Commands"])) {
+                $buildConfig = $this->build->config('Build');
                 foreach ($stepsConfig["Commands"] as $cmd) {
-                    $this->taskDrushCommand($cmd, $this->build)
-                        ->force()
+                    $this->taskDrushStack()
+                        ->drupalRootDirectory($this->build->path)
+                        ->siteAlias($buildConfig['drush-alias'])
+                        ->exec($cmd)
                         ->run();
                 }
             }
@@ -380,14 +411,17 @@ class DrupalRunner extends Tasks
      */
     protected function enableModuleList($list)
     {
+        $buildConfig = $this->build->config('Build');
         foreach ($list as $item) {
             if (is_array($item)) {
                 $list = implode(' ', $item);
             } else {
                 $list = $item;
             }
-            $this->taskDrushCommand("en $list", $this->build)
-                ->force()
+            $this->taskDrushStack()
+                ->drupalRootDirectory($this->build->path)
+                ->siteAlias($buildConfig['drush-alias'])
+                ->exec("en $list")
                 ->run();
         }
     }
