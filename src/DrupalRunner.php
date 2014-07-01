@@ -185,11 +185,7 @@ class DrupalRunner extends Tasks
     public function drupalFeatures()
     {
         $this->init();
-        foreach ($this->build->config('Features') as $feature) {
-            $this->taskDrushCommand("en $feature", $this->build)
-                ->force()
-                ->run();
-        }
+        $this->enableModuleList($this->build->config('Features'));
     }
 
     /**
@@ -362,16 +358,37 @@ class DrupalRunner extends Tasks
         if ('Pre' == $type || 'Post' == $type) {
             $stepsConfig = $this->build->config($type);
 
-            foreach (array('Modules', 'Commands') as $section) {
-                if (isset($stepsConfig[$section])) {
-                    foreach ($stepsConfig[$section] as $arg) {
-                        $cmd = ('Modules' == $section ? 'en ' : '') . $arg;
-                        $this->taskDrushCommand($cmd, $this->build)
-                            ->force()
-                            ->run();
-                    }
+            if (isset($stepsConfig['Modules'])) {
+                $this->enableModuleList($stepsConfig['Modules']);
+            }
+            if (isset($stepsConfig["Commands"])) {
+                foreach ($stepsConfig["Commands"] as $cmd) {
+                    $this->taskDrushCommand($cmd, $this->build)
+                        ->force()
+                        ->run();
                 }
             }
+        }
+    }
+
+    /**
+     * Helper function to enable a list of modules/themes/features.
+     *
+     * @param array $list
+     *   An nested array of things to enable. If the item is a string, enable it on it's own. If the item is an array,
+     *   implode it and enable them all at once.
+     */
+    protected function enableModuleList($list)
+    {
+        foreach ($list as $item) {
+            if (is_array($item)) {
+                $list = implode(' ', $item);
+            } else {
+                $list = $item;
+            }
+            $this->taskDrushCommand("en $list", $this->build)
+                ->force()
+                ->run();
         }
     }
 }
