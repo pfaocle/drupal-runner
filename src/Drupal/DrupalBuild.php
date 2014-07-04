@@ -126,6 +126,22 @@ class DrupalBuild
     }
 
     /**
+     * Returns an individual piece of build configuration.
+     *
+     * @param string $section
+     *   The section of configuration, e.g. 'Build', 'Site' etc.
+     * @param string $key
+     *   The key of the configuration element to get.
+     *
+     * @return mixed
+     *   The value of the configuration key, or null if not found.
+     */
+    public function getConfig($section, $key) {
+        $sectionConfig = $this->config($section);
+        return isset($sectionConfig[$key]) ? $sectionConfig[$key] : null;
+    }
+
+    /**
      * Returns an absolute path to a given relative one.
      *
      * @param string $path
