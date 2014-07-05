@@ -239,11 +239,7 @@ EOS;
         }
 
         // Empty the build directory.
-        // @todo This errors, sometimes:
-        //$this->taskCleanDir([$this->path()])->run();
-        $this->taskExec(
-            "cd {$this->path()} && rm -Rf *"
-        )->run();
+        $this->taskCleanDir([$this->path()])->run();
         $this->taskExec(
             "cd {$this->path()} && rm -f " . implode(' ', self::$drupalHiddenFiles)
         )->run();
