@@ -20,6 +20,11 @@ class DrupalRunner extends Tasks
     use Drush;
 
     /**
+     * Default Git remote to use.
+     */
+    const DEFAULT_GIT_REMOTE = 'origin';
+
+    /**
      * String used to identify when the Git working directory is clean.
      */
     const GIT_CLEAN_MSG = 'nothing to commit, working directory clean';
@@ -86,8 +91,8 @@ class DrupalRunner extends Tasks
         // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
         // changes, given them the opportunity to quit.
         //
-        // We assume a remote named 'origin' by not passing anything as the second parameter here. This is currently
-        // acceptable as we're cloning the repository afresh each time and the remote will be named 'origin'.
+        // We assume a remote named GIT_REMOTE ('origin') by not passing anything as the second parameter. This is
+        // currently acceptable as we're cloning the repository afresh each time and the remote will be named 'origin'.
         $this->checkLocalGit($this->build->path($sitesSubdir));
 
         // If we're this far, the user is OK with us emptying target directory and continuing.
@@ -315,12 +320,12 @@ class DrupalRunner extends Tasks
      * @param string $repositoryPath
      *   Absolute path to the Git repository to check.
      * @param string $remote
-     *   Name of the remote to check against. Defaults to 'origin'.
+     *   Name of the remote to check against.
      */
-    protected function checkLocalGit($repositoryPath, $remote = 'origin')
+    protected function checkLocalGit($repositoryPath, $remote = self::DEFAULT_GIT_REMOTE)
     {
         $ret = $this->taskExec("cd $repositoryPath && git status")->run();
-        if (!strpos($ret->getMessage(), $this::GIT_CLEAN_MSG)) {
+        if (!strpos($ret->getMessage(), self::GIT_CLEAN_MSG)) {
             $this->askContinueQuestion(
                 'Working directory not clean. Continuing will result in these changes being lost.',
                 'working directory not clean'
