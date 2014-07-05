@@ -10,13 +10,8 @@ An extension to [Robo](https://github.com/Codegyre/Robo) for building Drupal.
 
 1. Initialise your [Robo installation using Composer](https://github.com/Codegyre/Robo/blob/master/README.md#installing).
 2. Add `https://bitbucket.org/pfaocle/drupal-runner.git` to `composer.json` as a VCS repository.
-3. Add `"pfaocle": "dev-master"` to `composer.json`.
+3. Add `"pfaocle/drupal-runner": "dev-master"` to `composer.json`.
 4. Run `composer update`.
-
-_Note:_ you may also need to also run Composer for Robo as well as your own set-up:
-
-     cd vendor/codegyre/robo
-     composer install
 
 Drupal Runner requires Robo 0.4.1 or greater.
 
