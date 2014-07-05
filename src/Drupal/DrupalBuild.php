@@ -216,7 +216,6 @@ EOS;
         $settingsFilePath = "sites/{$buildConfig['sites-subdir']}/settings.php";
         $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
 
-        // @todo The append() magic method requires this change: https://github.com/Codegyre/Robo/pull/11
         $this->taskWriteToFile($this->path($settingsFilePath))
             ->text($envSettings)
             ->append()
