@@ -148,16 +148,14 @@ class DrupalRunner extends Tasks
         }
 
         // Site install.
-        $cmd = "site-install {$config['Build']['profile']} \\
-                    --db-url=mysql://{$db['user']}:{$db['password']}@localhost/{$db['name']} \\
-                    --sites-subdir={$config['Build']['sites-subdir']} \\
-                    --site-name=\"{$site['name']}\" \\
-                    --account-name={$site['rootuser']} \\
-                    --account-pass={$site['rootpassword']}";
-
         $this->taskDrushStack()
             ->siteAlias($this->build->getConfig('Build', 'drush-alias'))
-            ->exec($cmd)
+            ->dbUrl("mysql://{$db['user']}:{$db['password']}@localhost/{$db['name']}")
+            ->sitesSubdir($config['Build']['sites-subdir'])
+            ->siteName($site['name'])
+            ->accountName($site['rootuser'])
+            ->accountPass($site['rootpassword'])
+            ->siteInstall($config['Build']['profile'])
             ->run();
 
         if ($installDb) {
