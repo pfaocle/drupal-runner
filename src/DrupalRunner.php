@@ -53,9 +53,9 @@ class DrupalRunner extends Tasks
      * @param $path
      *   An absolute file path to the target build directory.
      */
-    public function drupalMagic($path)
+    public function drupalMagic($path, $opts = ['nonuke' => false])
     {
-        $this->drupalBuild($path);
+        $this->drupalBuild($path, $opts);
         $this->drupalMake();
         $this->drupalInstall();
         $this->drupalPre();
@@ -76,7 +76,7 @@ class DrupalRunner extends Tasks
      *
      * @throws \Exception
      */
-    public function drupalBuild($path)
+    public function drupalBuild($path, $opts = ['nonuke' => false])
     {
         $this->init();
 
@@ -96,14 +96,16 @@ class DrupalRunner extends Tasks
         $this->checkLocalGit($this->build->path($sitesSubdir));
 
         // If we're this far, the user is OK with us emptying target directory and continuing.
-        $this->build->cleanBuildDirectory();
+        if (!$opts['nonuke']) {
+            $this->build->cleanBuildDirectory();
 
-        // Clone the Git repository.
-        $this->taskGitStack()
-            ->cloneRepo($buildConfig['git'], $this->build->path($sitesSubdir))
-            ->run();
+            // Clone the Git repository.
+            $this->taskGitStack()
+                ->cloneRepo($buildConfig['git'], $this->build->path($sitesSubdir))
+                ->run();
 
-        $this->build->writeSitesPhpFile();
+            $this->build->writeSitesPhpFile();
+        }
     }
 
     /**
