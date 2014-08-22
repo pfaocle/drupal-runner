@@ -17,6 +17,7 @@ use Robo\Task\Shared\TaskException;
  */
 class DrupalRunner extends Tasks
 {
+    use DrupalBuildReview;
     use Drush;
 
     /**
