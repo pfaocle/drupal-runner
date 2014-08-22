@@ -373,9 +373,6 @@ class DrupalRunner extends Tasks
     {
         if ('Pre' == $type || 'Post' == $type) {
             $stepsConfig = $this->build->config($type);
-            if (isset($stepsConfig['Modules'])) {
-                $this->enableModuleList($stepsConfig['Modules']);
-            }
             if (isset($stepsConfig["Commands"])) {
                 foreach ($stepsConfig["Commands"] as $cmd) {
                     $this->taskDrushStack()
@@ -383,6 +380,9 @@ class DrupalRunner extends Tasks
                         ->exec($cmd)
                         ->run();
                 }
+            }
+            if (isset($stepsConfig['Modules'])) {
+                $this->enableModuleList($stepsConfig['Modules']);
             }
         }
     }
