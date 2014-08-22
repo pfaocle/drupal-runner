@@ -73,6 +73,8 @@ class DrupalRunner extends Tasks
      *
      * @param $path
      *   An absolute file path to the target build directory.
+     * @param array $opts
+     *   An array of options (and default values) passed to the command.
      *
      * @throws \Exception
      */
@@ -88,15 +90,15 @@ class DrupalRunner extends Tasks
         $buildConfig = $this->build->config('Build');
         $sitesSubdir = 'sites/' . $buildConfig['sites-subdir'];
 
-        // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
-        // changes, given them the opportunity to quit.
-        //
-        // We assume a remote named GIT_REMOTE ('origin') by not passing anything as the second parameter. This is
-        // currently acceptable as we're cloning the repository afresh each time and the remote will be named 'origin'.
-        $this->checkLocalGit($this->build->path($sitesSubdir));
-
-        // If we're this far, the user is OK with us emptying target directory and continuing.
         if (!$opts['nonuke']) {
+            // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
+            // changes, given them the opportunity to quit.
+            //
+            // We assume a remote named GIT_REMOTE ('origin') by not passing anything as the second parameter. This is
+            // currently acceptable as we're cloning the repository afresh each time and the remote will be named 'origin'.
+            $this->checkLocalGit($this->build->path($sitesSubdir));
+
+            // If we're this far, the user is OK with us emptying target directory and continuing.
             $this->build->cleanBuildDirectory();
 
             // Clone the Git repository.
