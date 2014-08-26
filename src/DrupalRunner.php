@@ -53,7 +53,7 @@ class DrupalRunner extends Tasks
      * @param $path
      *   An absolute file path to the target build directory.
      */
-    public function drupalMagic($path, $opts = ['nonuke' => false])
+    public function drupalMagic($path, $opts = ['nuke' => false])
     {
         $this->drupalBuild($path, $opts);
         $this->drupalMake();
@@ -78,7 +78,7 @@ class DrupalRunner extends Tasks
      *
      * @throws \Exception
      */
-    public function drupalBuild($path, $opts = ['nonuke' => false])
+    public function drupalBuild($path, $opts = ['nuke' => false])
     {
         $this->init();
 
@@ -90,7 +90,7 @@ class DrupalRunner extends Tasks
         $buildConfig = $this->build->config('Build');
         $sitesSubdir = 'sites/' . $buildConfig['sites-subdir'];
 
-        if (!$opts['nonuke']) {
+        if ($opts['nuke']) {
             // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
             // changes, given them the opportunity to quit.
             //
