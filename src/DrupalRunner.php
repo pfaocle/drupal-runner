@@ -105,7 +105,10 @@ class DrupalRunner extends Tasks
             $this->taskGitStack()
                 ->cloneRepo($buildConfig['git'], $this->build->path($sitesSubdir))
                 ->run();
+        }
 
+        if (!file_exists($this->build->path('sites/sites.php'))) {
+            $this->say('Writing new sites.php file.');
             $this->build->writeSitesPhpFile();
         }
     }
