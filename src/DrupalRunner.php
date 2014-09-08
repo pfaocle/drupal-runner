@@ -52,6 +52,8 @@ class DrupalRunner extends Tasks
      *
      * @param $path
      *   An absolute file path to the target build directory.
+     * @param array $opts
+     *   Array of command-line options and default values.
      */
     public function drupalMagic($path, $opts = ['nuke' => false])
     {
