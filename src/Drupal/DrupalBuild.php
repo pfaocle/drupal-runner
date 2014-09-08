@@ -136,7 +136,8 @@ class DrupalBuild
      * @return mixed
      *   The value of the configuration key, or null if not found.
      */
-    public function getConfig($section, $key) {
+    public function getConfig($section, $key)
+    {
         $sectionConfig = $this->config($section);
         return isset($sectionConfig[$key]) ? $sectionConfig[$key] : null;
     }
