@@ -93,6 +93,12 @@ class DrupalRunner extends Tasks
         $sitesSubdir = 'sites/' . $buildConfig['sites-subdir'];
 
         if ($opts['nuke']) {
+            // If we're actually running within the directory we've been asked to nuke, things will most certainly go
+            // awry. Check this and throw an exception if this is the case.
+            if (strpos(getcwd(), realpath($this->build->path())) !== FALSE) {
+                throw new TaskException(__CLASS__, "You cannot use --nuke from a build within the target directory.");
+            }
+
             // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
             // changes, given them the opportunity to quit.
             //
