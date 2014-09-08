@@ -95,15 +95,16 @@ class DrupalRunner extends Tasks
         if ($opts['nuke']) {
             // If we're actually running within the directory we've been asked to nuke, things will most certainly go
             // awry. Check this and throw an exception if this is the case.
-            if (strpos(getcwd(), realpath($this->build->path())) !== FALSE) {
+            if (strpos(getcwd(), realpath($this->build->path())) !== false) {
                 throw new TaskException(__CLASS__, "You cannot use --nuke from a build within the target directory.");
             }
 
-            // Perform a few checks on the local repository - if we're in a state where the user is likely to loose local
+            // Perform a few checks on the local repository - if we're in a state where the user is likely to lose local
             // changes, given them the opportunity to quit.
             //
             // We assume a remote named GIT_REMOTE ('origin') by not passing anything as the second parameter. This is
-            // currently acceptable as we're cloning the repository afresh each time and the remote will be named 'origin'.
+            // currently acceptable as we're cloning the repository afresh each time and the remote will be named
+            // 'origin'.
             $this->checkLocalGit($this->build->path($sitesSubdir));
 
             // If we're this far, the user is OK with us emptying target directory and continuing.
