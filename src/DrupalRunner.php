@@ -60,11 +60,24 @@ class DrupalRunner extends Tasks
         $this->drupalBuild($path, $opts);
         $this->drupalMake();
         $this->drupalInstall();
-        $this->drupalPre();
-        $this->drupalFeatures();
-        $this->drupalTheme();
-        $this->drupalMigrate();
-        $this->drupalPost();
+
+        $masterDatabaseAlias = $this->build->getConfig('Build', 'masterDbAlias');
+
+        // If no master database alias is defined, we perform a full build.
+        if (is_null($masterDatabaseAlias)) {
+            $this->drupalPre();
+            $this->drupalFeatures();
+            $this->drupalTheme();
+            $this->drupalMigrate();
+            $this->drupalPost();
+        } else {
+            // Do database sync from master database via Drush alias. WARNING: the sql-sync command is executed with the
+            // -y option, forcing it to run. Care should be taken to ensure aliases are configured correctly.
+            $this->taskDrushStack()
+              ->exec(sprintf('sql-sync %s %s', $masterDatabaseAlias, $this->build->getConfig('Build', 'drush-alias')))
+              ->run();
+        }
+
         $this->drupalCleanup();
     }
 
