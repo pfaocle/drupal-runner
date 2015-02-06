@@ -134,8 +134,14 @@ class DrupalRunner extends Tasks
 
         // Note that we need to change directory here, so don't wrap the path to make file in a call to path(). We also
         // avoid using $this->drush() as currently this is run on the host machine.
+        if (!isset($buildConfig['make-path'])) {
+            $path = "sites/{$buildConfig['sites-subdir']}";
+        } else {
+            $path = $buildConfig['make-path'];
+        }
+
         $this->taskExec(
-            "cd {$this->build->path()} && drush -y make sites/{$buildConfig['sites-subdir']}/{$buildConfig['make']} ."
+            "cd {$this->build->path()} && drush -y make $path/{$buildConfig['make']} ."
         )->run();
     }
 
