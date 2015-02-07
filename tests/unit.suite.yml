@@ -1,0 +1,6 @@
+#
+# Drupal Runner Codeception unit test suite configuration.
+#
+class_name: UnitTester
+modules:
+    enabled: [Asserts, UnitHelper]

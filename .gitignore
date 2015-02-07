@@ -4,3 +4,8 @@
 
 # Composer files and vendor packages.
 vendor
+
+# Codeception files.
+tests/_output/*
+!tests/_output/.gitignore
+tests/*/*Tester.php
