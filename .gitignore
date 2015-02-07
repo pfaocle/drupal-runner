@@ -3,5 +3,4 @@
 #
 
 # Composer files and vendor packages.
-vendor/
-composer.lock
+vendor
