@@ -13,7 +13,7 @@ An extension to [Robo](https://github.com/Codegyre/Robo) for building Drupal.
 3. Add `"pfaocle/drupal-runner": "dev-master"` to `composer.json`.
 4. Run `composer update`.
 
-Drupal Runner requires Robo 0.4.4 or greater.
+Drupal Runner minimally requires Robo 0.4.4, but is **currently incompatible with versions 0.4.6, 0.4.7 and any 0.5.x releases**. It's advised to fix your dependency to version **0.4.5** for now.
 
 ### Example
 
@@ -29,7 +29,7 @@ Drupal Runner requires Robo 0.4.4 or greater.
         ],
 
         "require": {
-            "codegyre/robo": "~0.4.4",
+            "codegyre/robo": "0.4.5",
             "pfaocle/drupal-runner": "dev-master"
         }
     }
