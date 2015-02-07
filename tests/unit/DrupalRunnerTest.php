@@ -14,6 +14,16 @@ class DrupalRunnerTest extends \Codeception\TestCase\Test
     protected $tester;
 
     /**
+     * Test we can instantiate this class, and that it is of expected type.
+     */
+    public function testClassIsInstantiableAndOfExpectedType()
+    {
+        $runner = new DrupalRunner();
+        $this->assertInstanceOf('\Robo\DrupalRunner', $runner);
+        $this->assertInstanceOf('\Robo\Tasks', $runner);
+    }
+
+    /**
      * Test the expected constants are available.
      */
     public function testExpectedConstantsAreAvailable()
