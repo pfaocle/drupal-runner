@@ -60,3 +60,12 @@ Check `example.drupal.build.yml` for more details. You will need to copy this fi
     class Robofile extends DrupalRunner
     {
     }
+
+
+## More build examples
+
+There are a few build examples available, for reference or to add to:
+
+* [d7-drupal-runner-example](https://github.com/pfaocle/d7-drupal-runner-example) - a minimal, vanilla Drupal 7 build.
+* [panopoly-drupal-runner-example](https://github.com/pfaocle/panopoly-drupal-runner-example) - Panopoly-based Drupal 7.
+* [openpublic-drupal-runner-example](https://github.com/pfaocle/openpublic-drupal-runner-example) - OpenPublic-based Drupal 7 build.
