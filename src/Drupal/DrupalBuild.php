@@ -167,6 +167,18 @@ class DrupalBuild
         $buildConfig = $this->config('Build');
 
         if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
+
+            require_once getcwd() . '/vendor/pfaocle/drupal-runner/vendor/twig/twig/lib/Twig/Autoloader.php';
+            \Twig_Autoloader::register();
+            $loader = new \Twig_Loader_Filesystem(getcwd() . '/vendor/pfaocle/drupal-runner/src/Templates');
+            $twig = new \Twig_Environment($loader, array(
+                'cache' => getcwd() . '/vendor/pfaocle/drupal-runner/src/Templates/cache',
+            ));
+            $template = $twig->loadTemplate('sites.php.twig');
+            $sitesFile = $template->render(array(
+                'sites' => implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites']))
+            ));
+
             $sitesFilePath = $this->path('sites/sites.php');
 
             // @todo Template, or combine these two tasks into one write?
