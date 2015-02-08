@@ -6,9 +6,18 @@
 
 namespace Robo\Drupal;
 
+use Robo\Drupal\Config\BuildConfiguration;
+//use Robo\Drupal\Config\SiteConfiguration;
+use Robo\Drupal\Config\YamlBuildLoader;
 use Robo\Task\Exec;
 use Robo\Task\FileSystem;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Yaml\Yaml;
+
 
 /**
  * Class DrupalBuild.
@@ -106,6 +115,30 @@ class DrupalBuild
 
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
+
+            $configDirectories = array(getcwd());
+            $locator = new FileLocator($configDirectories);
+
+            // Convert the config file into an array.
+            $loader = new YamlBuildLoader($locator);
+            $configValues = $loader->load($locator->locate('new.drupal.build.yml'));
+//var_dump($locator->locate('new.drupal.build.yml'));
+            // Process the array using the defined configuration.
+            $processor = new Processor();
+            $configuration = new BuildConfiguration();
+//            try {
+                $processedConfiguration = $processor->processConfiguration(
+                    $configuration,
+                    $configValues
+                );
+
+                // Configuration, validated:
+                var_dump($processedConfiguration);
+//            } catch (InvalidConfigurationException $e) {
+//                // Validation error.
+//                echo $e->getMessage() . PHP_EOL;
+//            }
+
             $configFile = getcwd() . '/drupal.build.yml';
             if (!file_exists($configFile)) {
                 throw new \Exception('Build configuration could not be found.');

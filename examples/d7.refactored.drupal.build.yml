@@ -1,0 +1,33 @@
+#
+# Example build configuration for a vanilla Drupal 7 site.
+#
+# Planned refactor for using Symfony's Config component.
+#
+# @see https://github.com/pfaocle/d7-drupal-runner-example/blob/master/README.md
+#
+
+#
+# Configuration for this build.
+#
+
+# Build details - Git, remotes, Drush, make file etc.
+build:
+    git: "https://github.com/pfaocle/d7-drupal-runner-example.git"
+    drush_alias: "@d7.local"
+    profile: minimal
+    sites_subdir: d7
+    make: d7.make
+    sites:
+        - 8080.d7.drupal.dev
+
+    # Site details - name and root user credentials.
+    site:
+        site_name: Drupal 7
+        root_username: root
+        root_password: root
+
+    # Database details.
+    database:
+        db_name: d7
+        db_username: root
+        db_password: root

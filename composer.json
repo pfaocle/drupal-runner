@@ -19,6 +19,7 @@
         "php": ">=5.4.0",
         "codegyre/robo": "0.4.5",
         "boedah/robo-drush": "1.0.*",
+        "symfony/config ": "~2.6",
         "symfony/yaml": "*"
     },
 

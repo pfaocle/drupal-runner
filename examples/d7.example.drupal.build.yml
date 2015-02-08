@@ -13,7 +13,7 @@
 # Build details - Git, remotes, Drush, make file etc.
 Build:
     git: https://github.com/pfaocle/d7-drupal-runner-example.git
-    drush-alias: @d7.local
+    drush-alias: "@d7.local"
     profile: minimal
     sites-subdir: d7
     make: make/d7.make
