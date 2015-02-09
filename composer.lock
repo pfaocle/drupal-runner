@@ -4,36 +4,37 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "71f6f341bad9d0f284779bc1ec12b5dd",
+    "hash": "2c78ea8970f4ce8511759f2f70633fdb",
     "packages": [
         {
             "name": "boedah/robo-drush",
-            "version": "1.0.3",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/boedah/robo-drush.git",
-                "reference": "70b157144fb32e365a22a0a3b73be1de7b7a48ed"
+                "reference": "782f45542a6676a095f00d28e5d00bbec00d5edb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/boedah/robo-drush/zipball/70b157144fb32e365a22a0a3b73be1de7b7a48ed",
-                "reference": "70b157144fb32e365a22a0a3b73be1de7b7a48ed",
+                "url": "https://api.github.com/repos/boedah/robo-drush/zipball/782f45542a6676a095f00d28e5d00bbec00d5edb",
+                "reference": "782f45542a6676a095f00d28e5d00bbec00d5edb",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
             },
             "conflict": {
-                "codegyre/robo": ">=0.4.6"
+                "codegyre/robo": "<0.5.0"
             },
             "require-dev": {
-                "codegyre/robo": "0.4.5",
-                "phpunit/phpunit": "~3.7"
+                "codegyre/robo": "~0.5",
+                "drush/drush": "~6.5",
+                "phpunit/phpunit": "~4.4"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Boedah\\Robo\\Task\\": "src"
+                    "Boedah\\Robo\\Task\\Drush\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -47,34 +48,36 @@
                 }
             ],
             "description": "Drush CommandStack for Robo Task Runner",
-            "time": "2015-01-25 01:00:56"
+            "time": "2015-01-25 02:36:22"
         },
         {
             "name": "codegyre/robo",
-            "version": "0.4.5",
+            "version": "0.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codegyre/Robo.git",
-                "reference": "12518fe1565c777ab85c676979636bc43406db2f"
+                "reference": "c75c2f21c41c851803a25b2ff1ed018fe10b6cf6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codegyre/Robo/zipball/12518fe1565c777ab85c676979636bc43406db2f",
-                "reference": "12518fe1565c777ab85c676979636bc43406db2f",
+                "url": "https://api.github.com/repos/Codegyre/Robo/zipball/c75c2f21c41c851803a25b2ff1ed018fe10b6cf6",
+                "reference": "c75c2f21c41c851803a25b2ff1ed018fe10b6cf6",
                 "shasum": ""
             },
             "require": {
                 "henrikbjorn/lurker": "1.0.*@dev",
                 "php": ">=5.4.0",
-                "symfony/console": "*",
-                "symfony/filesystem": "*",
-                "symfony/finder": "*",
-                "symfony/process": "*"
+                "symfony/console": "~2.5",
+                "symfony/filesystem": "~2.5",
+                "symfony/finder": "~2.5",
+                "symfony/process": "~2.5"
             },
             "require-dev": {
-                "codeception/aspect-mock": "*",
-                "codeception/codeception": "@dev",
-                "codeception/verify": "*"
+                "codeception/aspect-mock": "0.5.*",
+                "codeception/codeception": "~2.0",
+                "codeception/verify": "0.2.*",
+                "natxet/cssmin": "~3.0",
+                "patchwork/jsqueeze": "~1.0"
             },
             "bin": [
                 "robo"
@@ -96,7 +99,7 @@
                 }
             ],
             "description": "Modern task runner",
-            "time": "2014-08-05 04:07:15"
+            "time": "2015-01-27 02:41:11"
         },
         {
             "name": "henrikbjorn/lurker",
