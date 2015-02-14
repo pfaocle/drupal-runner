@@ -71,6 +71,12 @@ class DrupalBuild
     protected $config;
 
     /**
+     * @var array
+     *   Stores the new, refactored build configuration from symfony/config (temporary).
+     */
+    protected $newConfig;
+
+    /**
      * @var string
      *   An absolute path to the directory in which to build.
      */
@@ -122,7 +128,7 @@ class DrupalBuild
             // Convert the config file into an array.
             $loader = new YamlBuildLoader($locator);
             $configValues = $loader->load($locator->locate('new.drupal.build.yml'));
-//var_dump($locator->locate('new.drupal.build.yml'));
+
             // Process the array using the defined configuration.
             $processor = new Processor();
             $configuration = new BuildConfiguration();
@@ -134,6 +140,7 @@ class DrupalBuild
 
                 // Configuration, validated:
                 var_dump($processedConfiguration);
+            $this->newConfig = $processedConfiguration;
 //            } catch (InvalidConfigurationException $e) {
 //                // Validation error.
 //                echo $e->getMessage() . PHP_EOL;
