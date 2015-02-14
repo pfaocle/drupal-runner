@@ -139,8 +139,7 @@ class DrupalBuild
                 );
 
                 // Configuration, validated:
-                var_dump($processedConfiguration);
-            $this->newConfig = $processedConfiguration;
+                $this->newConfig = $processedConfiguration;
 //            } catch (InvalidConfigurationException $e) {
 //                // Validation error.
 //                echo $e->getMessage() . PHP_EOL;
