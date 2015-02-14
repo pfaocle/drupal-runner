@@ -237,8 +237,6 @@ class DrupalBuild
      */
     public function writeEnvironmentSettings()
     {
-        $buildConfig = $this->config('Build');
-
         // Include settings.$env.php
         $env = 'local';
         $envSettings = <<<EOS
@@ -250,7 +248,7 @@ if (file_exists(conf_path() . '/settings.$env.php')) {
 EOS;
 
         // Write the inclusion of environment specific configuration to main settings.php file.
-        $settingsFilePath = "sites/{$buildConfig['sites-subdir']}/settings.php";
+        $settingsFilePath = "sites/{$this->newConfig['sites_subdir']}/settings.php";
         $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
 
         $this->taskWriteToFile($this->path($settingsFilePath))
@@ -266,10 +264,8 @@ EOS;
      */
     public function cleanBuildDirectory()
     {
-        $buildConfig = $this->config('Build');
-
         // If the sites subdirectory exists, it may have no write permissions for any user.
-        $sitesSubdirPath = $this->path('sites/' . $buildConfig['sites-subdir']);
+        $sitesSubdirPath = $this->path('sites/' . $this->newConfig['sites_subdir']);
         if (file_exists($sitesSubdirPath)) {
             $this->taskExec("cd {$this->path()} && chmod u+w $sitesSubdirPath")->run();
         }
