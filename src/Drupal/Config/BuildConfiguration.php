@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * @todo
+ * Define the tree for a Drupal Runner build configuration.
  */
 class BuildConfiguration implements ConfigurationInterface
 {
