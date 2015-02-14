@@ -53,9 +53,51 @@ class BuildConfiguration implements ConfigurationInterface
                         ->scalarNode("db_password")->end()
                     ->end()
                 ->end()
+
+                ->append($this->addPreOrPostSteps("pre"))
+
+                ->arrayNode("features")
+                    ->prototype("scalar")->end()
+                ->end()
+
+                ->append($this->addPreOrPostSteps("post"))
             ->end()
         ;
 
         return $treeBuilder;
+    }
+
+    /**
+     * Build and return a 'pre' or 'post' step configuration node.
+     *
+     * @param string $step
+     *   The step to build, either 'pre' or 'post'.
+     *
+     * @return ArrayNodeDefinition|NodeDefinition
+     *   The built node definition.
+     *
+     * @throws \Exception
+     */
+    public function addPreOrPostSteps($step)
+    {
+        if ($step != "pre" && $step != 'post') {
+            throw new \Exception("$step is not a valid build step, must be 'pre' or 'post'.");
+        }
+
+        $builder = new TreeBuilder();
+        $node = $builder->root($step);
+
+        $node
+            ->children()
+                ->arrayNode("modules")
+                    ->prototype("scalar")->end()
+                ->end()
+                ->arrayNode("commands")
+                    ->prototype("scalar")->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
     }
 }

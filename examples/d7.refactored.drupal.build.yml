@@ -31,3 +31,19 @@ build:
         db_name: d7
         db_username: root
         db_password: root
+
+    # Pre-steps.
+    pre:
+        modules:
+            - features
+        commands:
+            - vset site_mail "noreply@example.com"
+
+    # Enable features.
+    features:
+        - dr7_example_feature
+
+    # Post-steps.
+    post:
+        commands:
+            - sqlq "UPDATE block SET status = 1, region = 'sidebar_first' WHERE module = 'user'"
