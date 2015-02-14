@@ -33,6 +33,7 @@ class BuildConfiguration implements ConfigurationInterface
                 ->scalarNode("profile")->end()
                 ->scalarNode("sites_subdir")->end()
                 ->scalarNode("make")->end()
+                ->scalarNode("make_path")->end()
                 ->arrayNode("sites")
                     ->prototype("scalar")->end()
                 ->end()

@@ -17,6 +17,7 @@ build:
     profile: minimal
     sites_subdir: d7
     make: d7.make
+    make_path: sites/d7
     sites:
         - 8080.d7.drupal.dev
 
