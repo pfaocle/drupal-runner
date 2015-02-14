@@ -20,12 +20,15 @@ build:
     make_path: sites/d7
     sites:
         - 8080.d7.drupal.dev
+        - d7.stage.example.com
+        - d7.prod.example.com
 
     # Site details - name and root user credentials.
     site:
         site_name: Drupal 7
         root_username: root
         root_password: root
+        theme: bootstrap_d7
 
     # Database details.
     database:
