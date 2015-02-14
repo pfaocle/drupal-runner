@@ -12,27 +12,27 @@
 
 # Build details - Git, remotes, Drush, make file etc.
 build:
-    git: "https://github.com/pfaocle/d7-drupal-runner-example.git"
-    drush_alias: "@d7.local"
+    git: "https://github.com/pfaocle/dr7-drupal-runner-example.git"
+    drush_alias: "@dr7.local"
     profile: minimal
-    sites_subdir: d7
-    make: d7.make
-    make_path: sites/d7
+    sites_subdir: dr7
+    make: dr7.make
+    make_path: sites/dr7
     sites:
-        - 8080.d7.drupal.dev
-        - d7.stage.example.com
-        - d7.prod.example.com
+        - 8080.dr7.drupal.dev
+        - dr7.stage.example.com
+        - dr7.prod.example.com
 
     # Site details - name and root user credentials.
     site:
         site_name: Drupal 7
         root_username: root
         root_password: root
-        theme: bootstrap_d7
+        theme: bootstrap_dr7
 
     # Database details.
     database:
-        db_name: d7
+        db_name: dr7
         db_username: root
         db_password: root
 
