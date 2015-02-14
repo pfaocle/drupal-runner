@@ -204,9 +204,7 @@ class DrupalBuild
      */
     public function writeSitesPhpFile()
     {
-        $buildConfig = $this->config('Build');
-
-        if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
+        if (isset($this->newConfig['sites']) && count($this->newConfig['sites']) > 0) {
             $sitesFilePath = $this->path('sites/sites.php');
 
             // @todo Template, or combine these two tasks into one write?
@@ -216,7 +214,7 @@ class DrupalBuild
 
             $this->taskReplaceInFile($sitesFilePath)
                 ->from('%sites')
-                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
+                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $this->newConfig['sites'])))
                 ->run();
         }
     }
@@ -232,8 +230,7 @@ class DrupalBuild
      */
     protected function sitesFileLineCallback($hostnamePattern)
     {
-        $buildConfig = $this->config('Build');
-        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $buildConfig['sites-subdir']);
+        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $this->newConfig['sites_subdir']);
     }
 
     /**
