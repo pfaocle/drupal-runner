@@ -47,6 +47,25 @@ build:
     features:
         - dr7_example_feature
 
+    # Migration.
+    migrate:
+        # Note we assume that Migrate and Migrate UI are required.
+        dependencies:
+            - migrate_d2d
+            - migrate_extras
+            - migrate_mysite                                            # Your custom migration module/classes.
+        source:
+            files:
+                variable: mysite_file_migration                         # File migrations can use this to set source files path.
+                dir: /var/www/vhosts/mysite-old.drupal.dev/files        # Provide the path to the source files folder.
+        groups:                                                         # We can migrate groups, in order...
+            - users
+            - terms
+            - default
+        migrations:                                                     # ... and/or also run individual migrations, in order.
+            - Roles
+            - Users
+
     # Post-steps.
     post:
         commands:
