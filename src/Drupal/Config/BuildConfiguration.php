@@ -38,6 +38,7 @@ class BuildConfiguration implements ConfigurationInterface
                     ->prototype("scalar")->end()
                 ->end()
 
+                // Site details.
                 ->arrayNode("site")
                     ->children()
                         ->scalarNode("site_name")->end()
@@ -47,6 +48,7 @@ class BuildConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
 
+                // Database details.
                 ->arrayNode("database")
                     ->children()
                         ->scalarNode("db_name")->end()
@@ -55,12 +57,15 @@ class BuildConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
 
+                // Pre steps.
                 ->append($this->addPreOrPostSteps("pre"))
 
+                // Enable Features modules.
                 ->arrayNode("features")
                     ->prototype("scalar")->end()
                 ->end()
 
+                // Migration.
                 ->arrayNode("migrate")
                     ->children()
                         ->arrayNode("dependencies")
@@ -85,6 +90,7 @@ class BuildConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
 
+                // Post steps.
                 ->append($this->addPreOrPostSteps("post"))
             ->end()
         ;
