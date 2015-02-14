@@ -7,7 +7,7 @@
 # Build details - Git, remotes, Drush, make file etc.
 Build:
     git: git@example.com:example/example-project/example-repo.git   # Path to read-accessible Git repository.
-    drush-alias: @site.dev                                          # Alias used to run remote Drush commands.
+    drush-alias: "@site.dev"                                        # Alias used to run remote Drush commands.
     profile: minimal                                                # Which profile to use when installing Drupal.
     sites-subdir: mysite                                            # Subdirectory of sites/ in which this site resides.
     make: make/mysite.make                                          # Location of make file relative to sites subdirectory.
