@@ -95,26 +95,30 @@ class DrupalBuild
      *   The section of configuration to load/return.
      * @param bool $refresh
      *   Load in config from file.
+     * @param bool $new
+     *   Use the new symfony/config based configuration when TRUE.
      *
      * @return array
      *   Parsed YAML configuration for $section, or the full configuration if $section not set.
      *
      * @throws \Exception
      */
-    public function config($section = '', $refresh = false)
+    public function config($section = '', $refresh = false, $new = false)
     {
-        $validConfig = array(
-            'Build',
-            'Site',
-            'Database',
-            'Pre',
-            'Features',
-            'Migrate',
-            'Post',
-        );
+        if (!$new) {
+            $validConfig = array(
+                'Build',
+                'Site',
+                'Database',
+                'Pre',
+                'Features',
+                'Migrate',
+                'Post',
+            );
 
-        if (!empty($section) && !in_array($section, $validConfig)) {
-            throw new \Exception($section . ' is not a valid build configuration section,');
+            if (!empty($section) && !in_array($section, $validConfig)) {
+                throw new \Exception($section . ' is not a valid build configuration section,');
+            }
         }
 
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
@@ -125,16 +129,22 @@ class DrupalBuild
             $this->loadOldConfig();
         }
 
-        if (!empty($section)) {
-            if (array_key_exists($section, $this->config)) {
-                return $this->config[$section];
-            }
+        if ($new) {
+            // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
+            return ($section === "build") ? $this->newConfig : $this->newConfig[$section];
         } else {
-            return $this->config;
-        }
+            // Old config.
+            if (!empty($section)) {
+                if (array_key_exists($section, $this->config)) {
+                    return $this->config[$section];
+                }
+            } else {
+                return $this->config;
+            }
 
-        // Always return an array (for a valid section) and let the caller handle empty configuration.
-        return array();
+            // Always return an array (for a valid section) and let the caller handle empty configuration.
+            return array();
+        }
     }
 
     /**
