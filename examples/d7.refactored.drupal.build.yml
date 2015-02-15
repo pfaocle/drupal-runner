@@ -54,11 +54,11 @@ build:
         dependencies:
             - migrate_d2d
             - migrate_extras
-            - migrate_mysite                                            # Your custom migration module/classes.
+            - migrate_dr7                                               # Your custom migration module/classes.
         source:
             files:
-                variable: mysite_file_migration                         # File migrations can use this to set source files path.
-                dir: /var/www/vhosts/mysite-old.drupal.dev/files        # Provide the path to the source files folder.
+                variable: dr7_file_migration                            # File migrations can use this to set source files path.
+                dir: /var/www/vhosts/dr7-old.drupal.dev/files           # Provide the path to the source files folder.
         groups:                                                         # We can migrate groups, in order...
             - users
             - terms
