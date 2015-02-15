@@ -15,9 +15,13 @@ class MigrateCest
      */
     public function testExpectedModulesHaveBeenEnabled(BuildTester $I)
     {
+        // A list of modules that Drupal Runner itself enables when the migrate step is present.
+        $enforcedModules = ["migrate", "migrate_ui"];
+        // A list of Migrate-related modules that have listed to be enabled in the dr7 build.
         // @todo Include "custom" migrate_dr7 module when added.
-        $expectedModules = ["migrate", "migrate_d2d", "migrate_extras"];
-        foreach ($expectedModules as $module) {
+        $modulesInBuild  = ["migrate_d2d", "migrate_extras"];
+
+        foreach (array_merge($enforcedModules, $modulesInBuild) as $module) {
             $I->seeInDatabase("system", ["name" => $module, "status" => 1]);
         }
     }
