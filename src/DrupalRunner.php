@@ -155,31 +155,32 @@ class DrupalRunner extends Tasks
     public function drupalInstall()
     {
         $this->init();
-        $config = $this->build->config();
-        $site = $config['Site'];
-        $db = $config['Database'];
+        $config = $this->build->config('', false, true);
+        $site = $config['site'];
+        $db = $config['database'];
 
         // For database builds, we install Drupal core using the minimal profile (to handle settings.php etc), then
         // import the source database.
-        if ($installDb = $this->build->getConfig('Build', 'install-db')) {
+        $installDb = $this->build->getConfig('build', 'install_db', true);
+        if ($installDb) {
             if (!file_exists($installDb)) {
                 throw new TaskException(
                     __CLASS__,
                     sprintf('Source database dump %s was not be found.', $installDb)
                 );
             }
-            $config['Build']['profile'] = 'minimal';
+            $config['profile'] = 'minimal';
         }
 
         // Site install.
         $this->taskDrushStack()
             ->siteAlias($this->build->getConfig('build', 'drush_alias', true))
-            ->dbUrl("mysql://{$db['user']}:{$db['password']}@localhost/{$db['name']}")
-            ->sitesSubdir($config['Build']['sites-subdir'])
-            ->siteName($site['name'])
-            ->accountName($site['rootuser'])
-            ->accountPass($site['rootpassword'])
-            ->siteInstall($config['Build']['profile'])
+            ->dbUrl("mysql://{$db['db_username']}:{$db['db_password']}@localhost/{$db['db_name']}")
+            ->sitesSubdir($config['sites_subdir'])
+            ->siteName($site['site_name'])
+            ->accountName($site['root_username'])
+            ->accountPass($site['root_password'])
+            ->siteInstall($config['profile'])
             ->run();
 
         if ($installDb) {

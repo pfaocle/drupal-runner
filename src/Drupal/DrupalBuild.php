@@ -131,7 +131,8 @@ class DrupalBuild
 
         if ($new) {
             // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
-            return ($section === "build") ? $this->newConfig : $this->newConfig[$section];
+            // @todo Also covers the request where $section == "", i.e. get entire config. Needs sorting.
+            return ($section === "build" || $section === "") ? $this->newConfig : $this->newConfig[$section];
         } else {
             // Old config.
             if (!empty($section)) {
@@ -208,9 +209,11 @@ class DrupalBuild
         if ($new) {
             // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
             if ($section == "build") {
-                return $this->newConfig[$key];
+                // @todo Check null return value here...
+                return isset($this->newConfig[$key]) ? $this->newConfig[$key] : null;
             } else {
-                return $this->newConfig[$section][$key];
+                // @todo Check null return value here...
+                return isset($this->newConfig[$section][$key]) ? $this->newConfig[$section][$key] : null;
             }
         } else {
             $sectionConfig = $this->config($section);
