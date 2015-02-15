@@ -89,8 +89,8 @@ class DrupalRunner extends Tasks
         }
         $this->build->path = $path;
 
-        $buildConfig = $this->build->config('Build');
-        $sitesSubdir = 'sites/' . $buildConfig['sites-subdir'];
+        $buildConfig = $this->build->config('build', false, true);
+        $sitesSubdir = 'sites/' . $buildConfig['sites_subdir'];
 
         if ($opts['nuke']) {
             // If we're actually running within the directory we've been asked to nuke, things will most certainly go
@@ -130,14 +130,14 @@ class DrupalRunner extends Tasks
     public function drupalMake()
     {
         $this->init();
-        $buildConfig = $this->build->config('Build');
+        $buildConfig = $this->build->config('build', false, true);
 
         // Build file can specify a different location for the make file
         // if not in the usual sites/sitename dir.
-        if (!isset($buildConfig['make-path'])) {
-            $path = "sites/{$buildConfig['sites-subdir']}";
+        if (!isset($buildConfig['make_path'])) {
+            $path = "sites/{$buildConfig['sites_subdir']}";
         } else {
-            $path = $buildConfig['make-path'];
+            $path = $buildConfig['make_path'];
         }
 
         // Note that we need to change directory here, so don't wrap the path to make file in a call to path(). We also
