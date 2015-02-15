@@ -217,7 +217,7 @@ class DrupalRunner extends Tasks
     public function drupalFeatures()
     {
         $this->init();
-        $this->enableModuleList($this->build->config('Features'));
+        $this->enableModuleList($this->build->config('features', false, true));
     }
 
     /**
