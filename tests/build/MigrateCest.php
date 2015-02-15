@@ -19,7 +19,7 @@ class MigrateCest
         $enforcedModules = ["migrate", "migrate_ui"];
         // A list of Migrate-related modules that have listed to be enabled in the dr7 build.
         // @todo Include "custom" migrate_dr7 module when added.
-        $modulesInBuild  = ["migrate_d2d", "migrate_extras"];
+        $modulesInBuild  = ["migrate_d2d", "migrate_extras", "migrate_example"];
 
         foreach (array_merge($enforcedModules, $modulesInBuild) as $module) {
             $I->seeInDatabase("system", ["name" => $module, "status" => 1]);
