@@ -32,6 +32,11 @@ class BuildConfiguration implements ConfigurationInterface
                 ->scalarNode("drush_alias")
                     ->isRequired()
                     ->cannotBeEmpty()
+                    ->validate()
+                    ->ifTrue(function ($alias) { return substr($alias, 0, 1) !== "@";
+                    })
+                        ->thenInvalid("Drush aliases must be specified with a leading @")
+                    ->end()
                 ->end()
                 ->scalarNode("profile")->end()
                 ->scalarNode("sites_subdir")    ->end()
