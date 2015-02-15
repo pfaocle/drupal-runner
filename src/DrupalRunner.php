@@ -249,8 +249,9 @@ class DrupalRunner extends Tasks
     public function drupalMigrate()
     {
         $this->init();
-        $migrateConfig = $this->build->config('Migrate');
+        $migrateConfig = $this->build->config('migrate', false, true);
 
+        // @todo Look at symfony/config canBeEnabled()
         if (!empty($migrateConfig)) {
             // We assume we'll want both Migrate UI and Migrate modules.
             $this->taskDrushStack()
@@ -258,9 +259,9 @@ class DrupalRunner extends Tasks
                 ->exec('en migrate_ui')
                 ->run();
 
-            if (isset($migrateConfig['Source']['Files'])) {
-                $cmd = "vset {$migrateConfig['Source']['Files']['variable']} \\
-                        \"{$migrateConfig['Source']['Files']['dir']}\"";
+            if (isset($migrateConfig['source']['files'])) {
+                $cmd = "vset {$migrateConfig['source']['files']['variable']} \\
+                        \"{$migrateConfig['source']['files']['dir']}\"";
                 $this->taskDrushStack()
                     ->siteAlias($this->build->getConfig('build', 'drush_alias', true))
                     ->exec($cmd)
@@ -268,8 +269,8 @@ class DrupalRunner extends Tasks
 
             }
 
-            if (isset($migrateConfig['Dependencies'])) {
-                foreach ($migrateConfig['Dependencies'] as $dependency) {
+            if (isset($migrateConfig['dependencies'])) {
+                foreach ($migrateConfig['dependencies'] as $dependency) {
                     $this->taskDrushStack()
                         ->siteAlias($this->build->getConfig('build', 'drush_alias', true))
                         ->exec("en $dependency")
@@ -277,8 +278,8 @@ class DrupalRunner extends Tasks
                 }
             }
 
-            if (isset($migrateConfig['Groups'])) {
-                foreach ($migrateConfig['Groups'] as $group) {
+            if (isset($migrateConfig['groups'])) {
+                foreach ($migrateConfig['groups'] as $group) {
                     $this->taskDrushStack()
                         ->siteAlias($this->build->getConfig('build', 'drush_alias', true))
                         ->exec("mi --group=$group")
@@ -286,8 +287,8 @@ class DrupalRunner extends Tasks
                 }
             }
 
-            if (isset($migrateConfig['Migrations'])) {
-                foreach ($migrateConfig['Migrations'] as $migration) {
+            if (isset($migrateConfig['migrations'])) {
+                foreach ($migrateConfig['migrations'] as $migration) {
                     $this->taskDrushStack()
                         ->siteAlias($this->build->getConfig('build', 'drush_alias', true))
                         ->exec("mi $migration")
