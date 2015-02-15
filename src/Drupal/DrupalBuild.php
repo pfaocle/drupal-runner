@@ -121,15 +121,10 @@ class DrupalBuild
 
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
-
             // Load the NEW symfony/config based configuration.
             $this->loadConfig();
-
-            $configFile = getcwd() . '/drupal.build.yml';
-            if (!file_exists($configFile)) {
-                throw new \Exception('Build configuration could not be found.');
-            }
-            $this->config = Yaml::parse(file_get_contents($configFile));
+            // Load the OLD configuration.
+            $this->loadOldConfig();
         }
 
         if (!empty($section)) {
@@ -142,6 +137,20 @@ class DrupalBuild
 
         // Always return an array (for a valid section) and let the caller handle empty configuration.
         return array();
+    }
+
+    /**
+     * Loads the OLD build configuration fully into $this->config
+     *
+     * @throws \Exception
+     */
+    protected function loadOldConfig()
+    {
+        $configFile = getcwd() . '/drupal.build.yml';
+        if (!file_exists($configFile)) {
+            throw new \Exception('Build configuration could not be found.');
+        }
+        $this->config = Yaml::parse(file_get_contents($configFile));
     }
 
     /**
