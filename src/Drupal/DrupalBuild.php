@@ -122,28 +122,8 @@ class DrupalBuild
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
 
-            $configDirectories = array(getcwd());
-            $locator = new FileLocator($configDirectories);
-
-            // Convert the config file into an array.
-            $loader = new YamlBuildLoader($locator);
-            $configValues = $loader->load($locator->locate('new.drupal.build.yml'));
-
-            // Process the array using the defined configuration.
-            $processor = new Processor();
-            $configuration = new BuildConfiguration();
-//            try {
-                $processedConfiguration = $processor->processConfiguration(
-                    $configuration,
-                    $configValues
-                );
-
-                // Configuration, validated:
-                $this->newConfig = $processedConfiguration;
-//            } catch (InvalidConfigurationException $e) {
-//                // Validation error.
-//                echo $e->getMessage() . PHP_EOL;
-//            }
+            // Load the NEW symfony/config based configuration.
+            $this->loadConfig();
 
             $configFile = getcwd() . '/drupal.build.yml';
             if (!file_exists($configFile)) {
@@ -162,6 +142,35 @@ class DrupalBuild
 
         // Always return an array (for a valid section) and let the caller handle empty configuration.
         return array();
+    }
+
+    /**
+     * Loads the build configuration fully into $this->newConfig
+     */
+    protected function loadConfig()
+    {
+        $configDirectories = array(getcwd());
+        $locator = new FileLocator($configDirectories);
+
+        // Convert the config file into an array.
+        $loader = new YamlBuildLoader($locator);
+        $configValues = $loader->load($locator->locate('new.drupal.build.yml'));
+
+        // Process the array using the defined configuration.
+        $processor = new Processor();
+        $configuration = new BuildConfiguration();
+//            try {
+        $processedConfiguration = $processor->processConfiguration(
+            $configuration,
+            $configValues
+        );
+
+        // Configuration, validated:
+        $this->newConfig = $processedConfiguration;
+//            } catch (InvalidConfigurationException $e) {
+//                // Validation error.
+//                echo $e->getMessage() . PHP_EOL;
+//            }
     }
 
     /**
