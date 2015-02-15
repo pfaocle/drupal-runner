@@ -187,14 +187,25 @@ class DrupalBuild
      *   The section of configuration, e.g. 'Build', 'Site' etc.
      * @param string $key
      *   The key of the configuration element to get.
+     * @param bool $new
+     *   Use the new symfony/config based configuration when TRUE.
      *
      * @return mixed
      *   The value of the configuration key, or null if not found.
      */
-    public function getConfig($section, $key)
+    public function getConfig($section, $key, $new = false)
     {
-        $sectionConfig = $this->config($section);
-        return isset($sectionConfig[$key]) ? $sectionConfig[$key] : null;
+        if ($new) {
+            // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
+            if ($section == "build") {
+                return $this->newConfig[$key];
+            } else {
+                return $this->newConfig[$section][$key];
+            }
+        } else {
+            $sectionConfig = $this->config($section);
+            return isset($sectionConfig[$key]) ? $sectionConfig[$key] : null;
+        }
     }
 
     /**
