@@ -103,7 +103,7 @@ class DrupalBuild
      *
      * @throws \Exception
      */
-    public function config($section = '', $refresh = false, $new = false)
+    public function config($section = '', $refresh = false, $new = true)
     {
         if (!$new) {
             $validConfig = array(
@@ -204,7 +204,7 @@ class DrupalBuild
      * @return mixed
      *   The value of the configuration key, or null if not found.
      */
-    public function getConfig($section, $key, $new = false)
+    public function getConfig($section, $key, $new = true)
     {
         if ($new) {
             // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
@@ -216,7 +216,8 @@ class DrupalBuild
                 return isset($this->newConfig[$section][$key]) ? $this->newConfig[$section][$key] : null;
             }
         } else {
-            $sectionConfig = $this->config($section);
+            // NOTE ensure we pass $new = false as the third parameter here, we MUST get the old config.
+            $sectionConfig = $this->config($section, false, false);
             return isset($sectionConfig[$key]) ? $sectionConfig[$key] : null;
         }
     }
