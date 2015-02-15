@@ -8,6 +8,12 @@ use \BuildTester;
 class MigrateCest
 {
     /**
+     * @var BuildTester
+     *   Store the Tester object being used to test.
+     */
+    protected $tester;
+
+    /**
      * Ensure expected Migrate-related modules have been enabled.
      *
      * @param \BuildTester $I
@@ -44,5 +50,67 @@ class MigrateCest
                 "value" => 's:40:"/var/www/vhosts/dr7-old.drupal.dev/files";',
             ]
         );
+    }
+
+    /**
+     * Check the database for some content that should have been migrated.
+     *
+     * This data is subject to changes in the migrate_extras module provided with Migrate.
+     *
+     * @see http://cgit.drupalcode.org/migrate/tree/migrate_example
+     *
+     * @param \BuildTester $I
+     *   The Tester object being used to test.
+     */
+    public function testExampleMigrationsHaveRun(BuildTester $I)
+    {
+        $this->tester = $I;
+
+        $this->migrationContentHelper("role", ["Taster", "Vintner"]);
+
+        $this->migrationContentHelper(
+            "users",
+            ["alice", "alice_2", "bob", "charlie", "darren", "emily", "fonzie"]
+        );
+
+        $this->migrationContentHelper(
+            "node_type",
+            ["migrate_example_beer", "migrate_example_producer", "migrate_example_wine"],
+            "type"
+        );
+
+        $this->migrationContentHelper(
+            "taxonomy_vocabulary",
+            [
+                "Migrate Example Beer Styles",
+                "Migrate Example Wine Best With",
+                "Migrate Example Wine Regions",
+                "Migrate Example Wine Varieties",
+            ]
+        );
+
+        $this->migrationContentHelper(
+            "node",
+            ["Archeo", "Boddington", "Boston Winery", "Heineken", "Miller Lite", "Montes"],
+            "title"
+        );
+    }
+
+    /**
+     * Helper for testing some Drupal tables for migrated content.
+     *
+     * @param string $table
+     *   Name of the Drupal database table.
+     * @param array $items
+     *   A non-associative array of item values to check for.
+     * @param string $key
+     *   The column name to check against.
+     */
+    protected function migrationContentHelper($table, $items, $key = "name")
+    {
+        $I = $this->tester;
+        foreach ($items as $item) {
+            $I->seeInDatabase($table, [$key => $item]);
+        }
     }
 }
