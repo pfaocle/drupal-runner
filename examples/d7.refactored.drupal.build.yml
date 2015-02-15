@@ -15,6 +15,7 @@ build:
     git: "https://github.com/pfaocle/dr7-drupal-runner-example.git"
     drush_alias: "@dr7.local"
     profile: minimal
+    install_db: dr7.sql
     sites_subdir: dr7
     make: dr7.make
     make_path: sites/dr7
