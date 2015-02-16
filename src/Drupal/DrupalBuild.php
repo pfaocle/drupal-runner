@@ -64,12 +64,6 @@ class DrupalBuild
 
     /**
      * @var array
-     *   Stores the build configuration.
-     */
-    protected $config;
-
-    /**
-     * @var array
      *   Stores the new, refactored build configuration from symfony/config (temporary).
      */
     protected $newConfig;
@@ -95,71 +89,20 @@ class DrupalBuild
      *   The section of configuration to load/return.
      * @param bool $refresh
      *   Load in config from file.
-     * @param bool $new
-     *   Use the new symfony/config based configuration when TRUE.
      *
      * @return array
      *   Parsed YAML configuration for $section, or the full configuration if $section not set.
-     *
-     * @throws \Exception
      */
-    public function config($section = '', $refresh = false, $new = true)
+    public function config($section = '', $refresh = false)
     {
-        if (!$new) {
-            $validConfig = array(
-                'Build',
-                'Site',
-                'Database',
-                'Pre',
-                'Features',
-                'Migrate',
-                'Post',
-            );
-
-            if (!empty($section) && !in_array($section, $validConfig)) {
-                throw new \Exception($section . ' is not a valid build configuration section,');
-            }
-        }
-
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
-        if ($refresh || empty($this->config)) {
-            // Load the NEW symfony/config based configuration.
+        if ($refresh || empty($this->newConfig)) {
             $this->loadConfig();
-            // Load the OLD configuration.
-            $this->loadOldConfig();
         }
 
-        if ($new) {
-            // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
-            // @todo Also covers the request where $section == "", i.e. get entire config. Needs sorting.
-            return ($section === "build" || $section === "") ? $this->newConfig : $this->newConfig[$section];
-        } else {
-            // Old config.
-            if (!empty($section)) {
-                if (array_key_exists($section, $this->config)) {
-                    return $this->config[$section];
-                }
-            } else {
-                return $this->config;
-            }
-
-            // Always return an array (for a valid section) and let the caller handle empty configuration.
-            return array();
-        }
-    }
-
-    /**
-     * Loads the OLD build configuration fully into $this->config
-     *
-     * @throws \Exception
-     */
-    protected function loadOldConfig()
-    {
-        $configFile = getcwd() . '/drupal.build.yml';
-        if (!file_exists($configFile)) {
-            throw new \Exception('Build configuration could not be found.');
-        }
-        $this->config = Yaml::parse(file_get_contents($configFile));
+        // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
+        // @todo Also covers the request where $section == "", i.e. get entire config. Needs sorting.
+        return ($section === "build" || $section === "") ? $this->newConfig : $this->newConfig[$section];
     }
 
     /**
@@ -198,27 +141,19 @@ class DrupalBuild
      *   The section of configuration, e.g. 'Build', 'Site' etc.
      * @param string $key
      *   The key of the configuration element to get.
-     * @param bool $new
-     *   Use the new symfony/config based configuration when TRUE.
      *
      * @return mixed
      *   The value of the configuration key, or null if not found.
      */
-    public function getConfig($section, $key, $new = true)
+    public function getConfig($section, $key)
     {
-        if ($new) {
-            // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
-            if ($section == "build") {
-                // @todo Check null return value here...
-                return isset($this->newConfig[$key]) ? $this->newConfig[$key] : null;
-            } else {
-                // @todo Check null return value here...
-                return isset($this->newConfig[$section][$key]) ? $this->newConfig[$section][$key] : null;
-            }
+        // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
+        if ($section == "build") {
+            // @todo Check null return value here...
+            return isset($this->newConfig[$key]) ? $this->newConfig[$key] : null;
         } else {
-            // NOTE ensure we pass $new = false as the third parameter here, we MUST get the old config.
-            $sectionConfig = $this->config($section, false, false);
-            return isset($sectionConfig[$key]) ? $sectionConfig[$key] : null;
+            // @todo Check null return value here...
+            return isset($this->newConfig[$section][$key]) ? $this->newConfig[$section][$key] : null;
         }
     }
 
