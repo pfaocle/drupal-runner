@@ -16,7 +16,7 @@ class BuildStepsCest
     public function testPreAndPostStepsHaveRun(BuildTester $I)
     {
         // Verify the defined pre step.
-        $I->seeInDatabase("variable", ["name" => "site_mail", "value" => "noreply@example.com"]);
+        $I->seeInDatabase("variable", ["name" => "site_mail", "value" => 's:19:"noreply@example.com";']);
 
         // Verify the defined post step.
         $I->seeInDatabase(
