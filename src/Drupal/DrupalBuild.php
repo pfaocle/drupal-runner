@@ -66,7 +66,7 @@ class DrupalBuild
      * @var array
      *   Stores the new, refactored build configuration from symfony/config (temporary).
      */
-    protected $newConfig;
+    protected $config;
 
     /**
      * @var string
@@ -96,17 +96,17 @@ class DrupalBuild
     public function config($section = '', $refresh = false)
     {
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
-        if ($refresh || empty($this->newConfig)) {
+        if ($refresh || empty($this->config)) {
             $this->loadConfig();
         }
 
         // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
         // @todo Also covers the request where $section == "", i.e. get entire config. Needs sorting.
-        return ($section === "build" || $section === "") ? $this->newConfig : $this->newConfig[$section];
+        return ($section === "build" || $section === "") ? $this->config : $this->config[$section];
     }
 
     /**
-     * Loads the build configuration fully into $this->newConfig
+     * Loads the build configuration fully into $this->config
      */
     protected function loadConfig()
     {
@@ -127,7 +127,7 @@ class DrupalBuild
         );
 
         // Configuration, validated:
-        $this->newConfig = $processedConfiguration;
+        $this->config = $processedConfiguration;
 //            } catch (InvalidConfigurationException $e) {
 //                // Validation error.
 //                echo $e->getMessage() . PHP_EOL;
@@ -150,10 +150,10 @@ class DrupalBuild
         // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
         if ($section == "build") {
             // @todo Check null return value here...
-            return isset($this->newConfig[$key]) ? $this->newConfig[$key] : null;
+            return isset($this->config[$key]) ? $this->config[$key] : null;
         } else {
             // @todo Check null return value here...
-            return isset($this->newConfig[$section][$key]) ? $this->newConfig[$section][$key] : null;
+            return isset($this->config[$section][$key]) ? $this->config[$section][$key] : null;
         }
     }
 
@@ -179,7 +179,7 @@ class DrupalBuild
      */
     public function writeSitesPhpFile()
     {
-        if (isset($this->newConfig['sites']) && count($this->newConfig['sites']) > 0) {
+        if (isset($this->config['sites']) && count($this->config['sites']) > 0) {
             $sitesFilePath = $this->path('sites/sites.php');
 
             // @todo Template, or combine these two tasks into one write?
@@ -189,7 +189,7 @@ class DrupalBuild
 
             $this->taskReplaceInFile($sitesFilePath)
                 ->from('%sites')
-                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $this->newConfig['sites'])))
+                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $this->config['sites'])))
                 ->run();
         }
     }
@@ -205,7 +205,7 @@ class DrupalBuild
      */
     protected function sitesFileLineCallback($hostnamePattern)
     {
-        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $this->newConfig['sites_subdir']);
+        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $this->config['sites_subdir']);
     }
 
     /**
@@ -224,7 +224,7 @@ if (file_exists(conf_path() . '/settings.$env.php')) {
 EOS;
 
         // Write the inclusion of environment specific configuration to main settings.php file.
-        $settingsFilePath = "sites/{$this->newConfig['sites_subdir']}/settings.php";
+        $settingsFilePath = "sites/{$this->config['sites_subdir']}/settings.php";
         $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
 
         $this->taskWriteToFile($this->path($settingsFilePath))
@@ -241,7 +241,7 @@ EOS;
     public function cleanBuildDirectory()
     {
         // If the sites subdirectory exists, it may have no write permissions for any user.
-        $sitesSubdirPath = $this->path('sites/' . $this->newConfig['sites_subdir']);
+        $sitesSubdirPath = $this->path('sites/' . $this->config['sites_subdir']);
         if (file_exists($sitesSubdirPath)) {
             $this->taskExec("cd {$this->path()} && chmod u+w $sitesSubdirPath")->run();
         }
