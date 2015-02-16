@@ -207,7 +207,7 @@ class DrupalRunner extends Tasks
     public function drupalPre()
     {
         $this->init();
-        $this->runSteps('Pre');
+        $this->runSteps('pre');
     }
 
     /**
@@ -306,7 +306,7 @@ class DrupalRunner extends Tasks
     public function drupalPost()
     {
         $this->init();
-        $this->runSteps('Post');
+        $this->runSteps('post');
     }
 
     /**
@@ -404,16 +404,16 @@ class DrupalRunner extends Tasks
         }
 
         $stepsConfig = $this->build->config($type);
-        if (isset($stepsConfig["Commands"])) {
-            foreach ($stepsConfig["Commands"] as $cmd) {
+        if (isset($stepsConfig["commands"])) {
+            foreach ($stepsConfig["commands"] as $cmd) {
                 $this->taskDrushStack()
                     ->siteAlias($this->build->getConfig('build', 'drush_alias'))
                     ->exec($cmd)
                     ->run();
             }
         }
-        if (isset($stepsConfig['Modules'])) {
-            $this->enableModuleList($stepsConfig['Modules']);
+        if (isset($stepsConfig['modules'])) {
+            $this->enableModuleList($stepsConfig['modules']);
         }
     }
 
