@@ -64,7 +64,7 @@ class DrupalBuild
 
     /**
      * @var array
-     *   Stores the new, refactored build configuration from symfony/config (temporary).
+     *   Stores the build configuration, as loaded and validated by symfony/config
      */
     protected $config;
 
