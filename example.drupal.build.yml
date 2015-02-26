@@ -10,6 +10,8 @@ Build:
     sites-subdir: mysite                                            # Subdirectory of sites/ in which this site resides.
     make: make/mysite.make                                          # Location of make file relative to sites subdirectory.
     make-path: profiles/myprofile                                   # Optional path to the make file, if not in the sites subdirectory.
+    make-options:                                                   # Array of make options (see drush help make).
+        contrib-destination: "sites/all"
     sites:                                                          # These sites patterns will be added to $sites.php
         - 8080.mysite.drupal.dev                                    #   and pointed to the main sites-subdir.
         - mysite.stage.example.com
