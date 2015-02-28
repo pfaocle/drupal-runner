@@ -16,7 +16,7 @@ class BuildConfiguration implements ConfigurationInterface
      * {@inheritdoc}
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder
-     *   The tree builder
+     *   The tree builder.
      */
     public function getConfigTreeBuilder()
     {
@@ -40,7 +40,7 @@ class BuildConfiguration implements ConfigurationInterface
                 ->end()
                 ->scalarNode("profile")->end()
                 ->scalarNode("install_db")->end()
-                ->scalarNode("sites_subdir")    ->end()
+                ->scalarNode("sites_subdir")->end()
                 ->scalarNode("make")->end()
                 ->scalarNode("make_path")->end()
                 ->arrayNode("sites")
