@@ -107,6 +107,9 @@ class DrupalBuild
 
     /**
      * Loads the build configuration fully into $this->config
+     *
+     * @throws InvalidConfigurationException
+     *   If build configuration doesn't validate
      */
     protected function loadConfig()
     {
@@ -120,18 +123,9 @@ class DrupalBuild
         // Process the array using the defined configuration.
         $processor = new Processor();
         $configuration = new BuildConfiguration();
-//            try {
-        $processedConfiguration = $processor->processConfiguration(
-            $configuration,
-            $configValues
-        );
 
-        // Configuration, validated:
-        $this->config = $processedConfiguration;
-//            } catch (InvalidConfigurationException $e) {
-//                // Validation error.
-//                echo $e->getMessage() . PHP_EOL;
-//            }
+        // Configuration, validated. Will throw an InvalidConfigurationException if the configuration is invalid.
+        $this->config = $processor->processConfiguration($configuration, $configValues);
     }
 
     /**
