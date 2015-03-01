@@ -115,6 +115,7 @@ class BuildConfiguration implements ConfigurationInterface
         $node = $builder->root($step);
 
         $node
+            ->canBeEnabled()
             ->children()
                 ->arrayNode("modules")
                     ->prototype("scalar")->end()
@@ -140,6 +141,7 @@ class BuildConfiguration implements ConfigurationInterface
         $node = $builder->root("migrate");
 
         $node
+            ->canBeEnabled()
             ->children()
                 ->arrayNode("dependencies")
                     ->prototype("scalar")->end()
