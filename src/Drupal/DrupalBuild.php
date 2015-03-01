@@ -136,11 +136,10 @@ class DrupalBuild
             return $section === "build" ? $this->config : $this->config[$section];
         } else {
             if ($section == "build") {
-                // @todo Check null return value here...
-                return isset($this->config[$key]) ? $this->config[$key] : null;
+                // A key in the 'build' section is actually in the root of the configuration tree:
+                return $this->config[$key];
             } else {
-                // @todo Check null return value here...
-                return isset($this->config[$section][$key]) ? $this->config[$section][$key] : null;
+                return $this->config[$section][$key];
             }
         }
     }
