@@ -84,29 +84,7 @@ class BuildConfiguration implements ConfigurationInterface
                 ->end()
 
                 // Migration.
-                ->arrayNode("migrate")
-                    ->children()
-                        ->arrayNode("dependencies")
-                            ->prototype("scalar")->end()
-                        ->end()
-                        ->arrayNode("source")
-                            ->children()
-                                ->arrayNode("files")
-                                    ->children()
-                                        ->scalarNode("variable")->end()
-                                        ->scalarNode("dir")->end()
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode("groups")
-                            ->prototype("scalar")->end()
-                        ->end()
-                        ->arrayNode("migrations")
-                            ->prototype("scalar")->end()
-                        ->end()
-                    ->end()
-                ->end()
+                ->append($this->addMigrateSection())
 
                 // Post steps.
                 ->append($this->addPreOrPostSteps("post"))
@@ -142,6 +120,44 @@ class BuildConfiguration implements ConfigurationInterface
                     ->prototype("scalar")->end()
                 ->end()
                 ->arrayNode("commands")
+                    ->prototype("scalar")->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    /**
+     * Build and return the migrate section node.
+     *
+     * @return ArrayNodeDefinition|NodeDefinition
+     *   The built node definition.
+     */
+    public function addMigrateSection()
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root("migrate");
+
+        $node
+            ->children()
+                ->arrayNode("dependencies")
+                    ->prototype("scalar")->end()
+                ->end()
+                ->arrayNode("source")
+                    ->children()
+                        ->arrayNode("files")
+                            ->children()
+                                ->scalarNode("variable")->end()
+                                ->scalarNode("dir")->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode("groups")
+                    ->prototype("scalar")->end()
+                ->end()
+                ->arrayNode("migrations")
                     ->prototype("scalar")->end()
                 ->end()
             ->end()
