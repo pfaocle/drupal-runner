@@ -111,48 +111,38 @@ class DrupalBuild
     }
 
     /**
-     * Loads and returns the build configuration.
+     * Returns an individual piece of build configuration.
      *
      * @param string $section
-     *   The section of configuration to load/return. Defaults to "all", returning the entire configuration tree.
+     *   The section of configuration to return, or in which the given $key is. For example, 'site', 'pre', etc.
+     *   Defaults to 'all', returning the entire configuration tree.
+     * @param string $key
+     *   The key of the configuration element to get. If null the entire $section of configuration is returned.
      * @param bool $refresh
      *   Load in config from file.
      *
-     * @return array
-     *   Parsed YAML configuration for $section, or the full configuration if $section not set.
+     * @return array|string|null
+     *   An array of parsed configuration for $section, the value of the configuration $key, or null if not found.
      */
-    public function config($section = "all", $refresh = false)
+    public function config($section = "all", $key = null, $refresh = false)
     {
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
             $this->loadConfig();
         }
 
-        // @todo Now that the "build" section comprises the config keys at the top level, the default is to return the
-        // entire configuration. Some of the existing calls probably don't need the whole thing... does that matter?
-        return $section === "all" ? $this->config : $this->config[$section];
-    }
-
-    /**
-     * Returns an individual piece of build configuration.
-     *
-     * @param string $section
-     *   The section of configuration, e.g. 'Build', 'Site' etc.
-     * @param string $key
-     *   The key of the configuration element to get.
-     *
-     * @return mixed
-     *   The value of the configuration key, or null if not found.
-     */
-    public function getConfig($section, $key)
-    {
-        // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
-        if ($section == "build") {
-            // @todo Check null return value here...
-            return isset($this->config[$key]) ? $this->config[$key] : null;
+        // If $key == null, we want the entire section.
+        if (is_null($key)) {
+            return $section === "all" ? $this->config : $this->config[$section];
         } else {
-            // @todo Check null return value here...
-            return isset($this->config[$section][$key]) ? $this->config[$section][$key] : null;
+            // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
+            if ($section == "build" || $section == "all") {
+                // @todo Check null return value here...
+                return isset($this->config[$key]) ? $this->config[$key] : null;
+            } else {
+                // @todo Check null return value here...
+                return isset($this->config[$section][$key]) ? $this->config[$section][$key] : null;
+            }
         }
     }
 

@@ -89,8 +89,7 @@ class DrupalRunner extends Tasks
         }
         $this->build->path = $path;
 
-        $buildConfig = $this->build->config();
-        $sitesSubdir = 'sites/' . $buildConfig['sites_subdir'];
+        $sitesSubdir = 'sites/' . $this->build->config("all", "sites_subdir");
 
         if ($opts['nuke']) {
             // If we're actually running within the directory we've been asked to nuke, things will most certainly go
@@ -112,7 +111,7 @@ class DrupalRunner extends Tasks
 
             // Clone the Git repository.
             $this->taskGitStack()
-                ->cloneRepo($buildConfig['git'], $this->build->path($sitesSubdir))
+                ->cloneRepo($this->build->config("all", "git"), $this->build->path($sitesSubdir))
                 ->run();
         }
 
@@ -161,7 +160,7 @@ class DrupalRunner extends Tasks
 
         // For database builds, we install Drupal core using the minimal profile (to handle settings.php etc), then
         // import the source database.
-        $installDb = $this->build->getConfig('build', 'install_db');
+        $installDb = $this->build->config('build', 'install_db');
         if ($installDb) {
             if (!file_exists($installDb)) {
                 throw new TaskException(
@@ -174,7 +173,7 @@ class DrupalRunner extends Tasks
 
         // Site install.
         $this->taskDrushStack()
-            ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+            ->siteAlias($this->build->config('build', 'drush_alias'))
             ->dbUrl("mysql://{$db['db_username']}:{$db['db_password']}@localhost/{$db['db_name']}")
             ->sitesSubdir($config['sites_subdir'])
             ->siteName($site['site_name'])
@@ -189,7 +188,7 @@ class DrupalRunner extends Tasks
             // Import DB. Note we drop the entire database here, as there could be tables in the minimal install
             // that aren't present in the imported SQL (nor are there any DROP TABLE x IF EXISTS... statements).
             $this->taskDrushStack()
-                ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec('sql-drop')
                 ->exec('sql-cli < ' . $installDb)
                 ->run();
@@ -231,11 +230,11 @@ class DrupalRunner extends Tasks
         $this->init();
 
         // Enable theme, if set.
-        if ($this->build->getConfig('site', 'theme')) {
+        if ($this->build->config('site', 'theme')) {
             $this->taskDrushStack()
-                ->siteAlias($this->build->getConfig('build', 'drush_alias'))
-                ->exec('en ' . $this->build->getConfig('site', 'theme'))
-                ->exec('vset theme_default  ' . $this->build->getConfig('site', 'theme'))
+                ->siteAlias($this->build->config('build', 'drush_alias'))
+                ->exec('en ' . $this->build->config('site', 'theme'))
+                ->exec('vset theme_default  ' . $this->build->config('site', 'theme'))
                 ->exec('dis ' . DrupalBuild::$drupalDefaultTheme)
                 ->run();
         }
@@ -255,7 +254,7 @@ class DrupalRunner extends Tasks
         if (!empty($migrateConfig)) {
             // We assume we'll want both Migrate UI and Migrate modules.
             $this->taskDrushStack()
-                ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec('en migrate_ui')
                 ->run();
 
@@ -263,7 +262,7 @@ class DrupalRunner extends Tasks
                 $cmd = "vset {$migrateConfig['source']['files']['variable']} \\
                         \"{$migrateConfig['source']['files']['dir']}\"";
                 $this->taskDrushStack()
-                    ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                    ->siteAlias($this->build->config('build', 'drush_alias'))
                     ->exec($cmd)
                     ->run();
 
@@ -272,7 +271,7 @@ class DrupalRunner extends Tasks
             if (isset($migrateConfig['dependencies'])) {
                 foreach ($migrateConfig['dependencies'] as $dependency) {
                     $this->taskDrushStack()
-                        ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                        ->siteAlias($this->build->config('build', 'drush_alias'))
                         ->exec("en $dependency")
                         ->run();
                 }
@@ -281,7 +280,7 @@ class DrupalRunner extends Tasks
             if (isset($migrateConfig['groups'])) {
                 foreach ($migrateConfig['groups'] as $group) {
                     $this->taskDrushStack()
-                        ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                        ->siteAlias($this->build->config('build', 'drush_alias'))
                         ->exec("mi --group=$group")
                         ->run();
                 }
@@ -290,7 +289,7 @@ class DrupalRunner extends Tasks
             if (isset($migrateConfig['migrations'])) {
                 foreach ($migrateConfig['migrations'] as $migration) {
                     $this->taskDrushStack()
-                        ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                        ->siteAlias($this->build->config('build', 'drush_alias'))
                         ->exec("mi $migration")
                         ->run();
                 }
@@ -326,12 +325,12 @@ class DrupalRunner extends Tasks
         $featuresConfig = $this->build->config('features');
         if (!empty($featuresConfig)) {
             $this->taskDrushStack()
-                ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->revertAllFeatures()
                 ->run();
         }
         $this->taskDrushStack()
-            ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+            ->siteAlias($this->build->config('build', 'drush_alias'))
             ->clearCache()
             ->run();
     }
@@ -407,7 +406,7 @@ class DrupalRunner extends Tasks
         if (isset($stepsConfig["commands"])) {
             foreach ($stepsConfig["commands"] as $cmd) {
                 $this->taskDrushStack()
-                    ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                    ->siteAlias($this->build->config('build', 'drush_alias'))
                     ->exec($cmd)
                     ->run();
             }
@@ -433,7 +432,7 @@ class DrupalRunner extends Tasks
                 $list = $item;
             }
             $this->taskDrushStack()
-                ->siteAlias($this->build->getConfig('build', 'drush_alias'))
+                ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec("en $list")
                 ->run();
         }
