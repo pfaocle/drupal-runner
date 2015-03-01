@@ -89,7 +89,7 @@ class DrupalRunner extends Tasks
         }
         $this->build->path = $path;
 
-        $sitesSubdir = 'sites/' . $this->build->config("all", "sites_subdir");
+        $sitesSubdir = 'sites/' . $this->build->config("build", "sites_subdir");
 
         if ($opts['nuke']) {
             // If we're actually running within the directory we've been asked to nuke, things will most certainly go
@@ -111,7 +111,7 @@ class DrupalRunner extends Tasks
 
             // Clone the Git repository.
             $this->taskGitStack()
-                ->cloneRepo($this->build->config("all", "git"), $this->build->path($sitesSubdir))
+                ->cloneRepo($this->build->config("build", "git"), $this->build->path($sitesSubdir))
                 ->run();
         }
 

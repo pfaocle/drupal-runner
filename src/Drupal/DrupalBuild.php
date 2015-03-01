@@ -115,7 +115,7 @@ class DrupalBuild
      *
      * @param string $section
      *   The section of configuration to return, or in which the given $key is. For example, 'site', 'pre', etc.
-     *   Defaults to 'all', returning the entire configuration tree.
+     *   Defaults to 'build', returning the entire (top-level) configuration tree.
      * @param string $key
      *   The key of the configuration element to get. If null the entire $section of configuration is returned.
      * @param bool $refresh
@@ -124,7 +124,7 @@ class DrupalBuild
      * @return array|string|null
      *   An array of parsed configuration for $section, the value of the configuration $key, or null if not found.
      */
-    public function config($section = "all", $key = null, $refresh = false)
+    public function config($section = "build", $key = null, $refresh = false)
     {
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
@@ -133,10 +133,9 @@ class DrupalBuild
 
         // If $key == null, we want the entire section.
         if (is_null($key)) {
-            return $section === "all" ? $this->config : $this->config[$section];
+            return $section === "build" ? $this->config : $this->config[$section];
         } else {
-            // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
-            if ($section == "build" || $section == "all") {
+            if ($section == "build") {
                 // @todo Check null return value here...
                 return isset($this->config[$key]) ? $this->config[$key] : null;
             } else {
