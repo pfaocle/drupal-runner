@@ -250,8 +250,7 @@ class DrupalRunner extends Tasks
         $this->init();
         $migrateConfig = $this->build->config('migrate');
 
-        // @todo Look at symfony/config canBeEnabled()
-        if (!empty($migrateConfig)) {
+        if ($migrateConfig["enabled"]) {
             // We assume we'll want both Migrate UI and Migrate modules.
             $this->taskDrushStack()
                 ->siteAlias($this->build->config('build', 'drush_alias'))
@@ -403,7 +402,7 @@ class DrupalRunner extends Tasks
         }
 
         $stepsConfig = $this->build->config($type);
-        if (isset($stepsConfig["commands"])) {
+        if ($stepsConfig["enabled"]) {
             foreach ($stepsConfig["commands"] as $cmd) {
                 $this->taskDrushStack()
                     ->siteAlias($this->build->config('build', 'drush_alias'))
@@ -411,7 +410,7 @@ class DrupalRunner extends Tasks
                     ->run();
             }
         }
-        if (isset($stepsConfig['modules'])) {
+        if ($stepsConfig["enabled"]) {
             $this->enableModuleList($stepsConfig['modules']);
         }
     }
