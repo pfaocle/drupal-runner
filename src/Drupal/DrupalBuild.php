@@ -91,23 +91,23 @@ class DrupalBuild
      * Loads and returns the build configuration.
      *
      * @param string $section
-     *   The section of configuration to load/return.
+     *   The section of configuration to load/return. Defaults to "all", returning the entire configuration tree.
      * @param bool $refresh
      *   Load in config from file.
      *
      * @return array
      *   Parsed YAML configuration for $section, or the full configuration if $section not set.
      */
-    public function config($section = '', $refresh = false)
+    public function config($section = "all", $refresh = false)
     {
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
             $this->loadConfig();
         }
 
-        // @todo We've "moved" the old Build key... this needs refactoring once the switch is complete.
-        // @todo Also covers the request where $section == "", i.e. get entire config. Needs sorting.
-        return ($section === "build" || $section === "") ? $this->config : $this->config[$section];
+        // @todo Now that the "build" section comprises the config keys at the top level, the default is to return the
+        // entire configuration. Some of the existing calls probably don't need the whole thing... does that matter?
+        return $section === "all" ? $this->config : $this->config[$section];
     }
 
     /**

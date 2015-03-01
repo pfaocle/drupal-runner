@@ -89,7 +89,7 @@ class DrupalRunner extends Tasks
         }
         $this->build->path = $path;
 
-        $buildConfig = $this->build->config('build');
+        $buildConfig = $this->build->config();
         $sitesSubdir = 'sites/' . $buildConfig['sites_subdir'];
 
         if ($opts['nuke']) {
@@ -130,7 +130,7 @@ class DrupalRunner extends Tasks
     public function drupalMake()
     {
         $this->init();
-        $buildConfig = $this->build->config('build');
+        $buildConfig = $this->build->config();
 
         // Build file can specify a different location for the make file
         // if not in the usual sites/sitename dir.
