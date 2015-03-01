@@ -28,6 +28,11 @@ class DrupalBuild
     use FileSystem;
 
     /**
+     * Name of the build configuration file.
+     */
+    const BUILD_CONFIG_FILE = "new.drupal.build.yml";
+
+    /**
      * @var array
      *   A list of Drupal's hidden files (to remove).
      */
@@ -118,7 +123,7 @@ class DrupalBuild
 
         // Convert the config file into an array.
         $loader = new YamlBuildLoader($locator);
-        $configValues = $loader->load($locator->locate('new.drupal.build.yml'));
+        $configValues = $loader->load($locator->locate(self::BUILD_CONFIG_FILE));
 
         // Process the array using the defined configuration.
         $processor = new Processor();
