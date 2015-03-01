@@ -30,7 +30,7 @@ class DrupalBuild
     /**
      * Name of the build configuration file.
      */
-    const BUILD_CONFIG_FILE = "new.drupal.build.yml";
+    const BUILD_CONFIG_FILE = "drupal.build.yml";
 
     /**
      * @var array
