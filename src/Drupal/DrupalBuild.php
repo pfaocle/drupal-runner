@@ -134,14 +134,16 @@ class DrupalBuild
         // If $key == null, we want the entire section.
         if (is_null($key)) {
             return $section === "build" ? $this->config : $this->config[$section];
-        } else {
-            if ($section == "build") {
-                // A key in the 'build' section is actually in the root of the configuration tree:
-                return $this->config[$key];
-            } else {
-                return $this->config[$section][$key];
-            }
         }
+
+        // If no $section is passed, 'build' is assumed. A key in the 'build' section is actually in the root of the
+        // configuration tree.
+        if ($section == "build") {
+            return $this->config[$key];
+        }
+
+        // Otherwise we want a $key in a specific sub-section of configuration.
+        return $this->config[$section][$key];
     }
 
     /**
