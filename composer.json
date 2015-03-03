@@ -20,7 +20,7 @@
         "codegyre/robo": "0.4.5",
         "boedah/robo-drush": "1.0.*",
         "symfony/yaml": "*",
-        "symfony/config ": "~2.6"
+        "symfony/config": "~2.6"
     },
 
     "require-dev": {
