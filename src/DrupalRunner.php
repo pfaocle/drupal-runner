@@ -133,8 +133,6 @@ class DrupalRunner extends Tasks
 
         $path = "sites/{$buildConfig['sites_subdir']}";
 
-        $path = "sites/{$buildConfig['sites-subdir']}";
-
         // Build file can specify a different location for the make file
         // if not in the usual sites/sitename dir.
         if (isset($buildConfig['make']['path'])) {
