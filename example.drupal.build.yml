@@ -1,16 +1,17 @@
 #
-# Example build configuration. Rename this file to 'drupal.build.yml' to enable.
-#
-# Configuration for this build.
+# Example Drupal Runner build configuration, using ALL the options.
 #
 
 # Build details - Git, remotes, Drush, make file etc.
 Build:
     git: git@example.com:example/example-project/example-repo.git   # Path to read-accessible Git repository.
-    drush-alias: @site.dev                                          # Alias used to run remote Drush commands.
+    drush-alias: "@site.dev"                                        # Alias used to run remote Drush commands.
     profile: minimal                                                # Which profile to use when installing Drupal.
     sites-subdir: mysite                                            # Subdirectory of sites/ in which this site resides.
     make: make/mysite.make                                          # Location of make file relative to sites subdirectory.
+    make-path: profiles/myprofile                                   # Optional path to the make file, if not in the sites subdirectory.
+    make-options:                                                   # Array of make options (see drush help make).
+        contrib-destination: "sites/all"
     sites:                                                          # These sites patterns will be added to $sites.php
         - 8080.mysite.drupal.dev                                    #   and pointed to the main sites-subdir.
         - mysite.stage.example.com
