@@ -132,18 +132,36 @@ class DrupalRunner extends Tasks
         $this->init();
         $buildConfig = $this->build->config('Build');
 
+        $path = "sites/{$buildConfig['sites-subdir']}";
+
         // Build file can specify a different location for the make file
         // if not in the usual sites/sitename dir.
-        if (!isset($buildConfig['make-path'])) {
-            $path = "sites/{$buildConfig['sites-subdir']}";
-        } else {
+        if (isset($buildConfig['make-path'])) {
             $path = $buildConfig['make-path'];
         }
 
-        // Note that we need to change directory here, so don't wrap the path to make file in a call to path(). We also
-        // avoid using $this->drush() as currently this is run on the host machine.
+        $options = array();
+        if (isset($buildConfig['make-options'])) {
+
+            if (!is_array($buildConfig['make-options'])) {
+                throw new TaskException(__CLASS__, "make-options must be an array of key (option name), value pairs");
+            }
+
+            $options = $buildConfig['make-options'];
+            array_walk($options, function (&$value, $key) {
+                $value = "--$key=$value";
+            });
+        }
+
         $this->taskExec(
-            "cd {$this->build->path()} && drush -y make $path/{$buildConfig['make']} ."
+            sprintf(
+                // Note that we need to change directory here, so don't wrap the path to make file in a call to
+                // path(). We also avoid using $this->drush() as currently this is run on the host machine.
+                "cd %s && drush -y make %s %s .",
+                escapeshellarg($this->build->path()),
+                implode(" ", array_map("escapeshellarg", $options)),
+                escapeshellarg("$path/{$buildConfig['make']}")
+            )
         )->run();
     }
 
