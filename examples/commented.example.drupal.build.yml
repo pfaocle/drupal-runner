@@ -4,7 +4,7 @@
 
 build:
     git: git@example.com:example/example-project/example-repo.git   # Path to read-accessible Git repository.
-    drush-alias: "@site.dev"                                        # Alias used to run remote Drush commands.
+    drush_alias: "@site.dev"                                        # Alias used to run remote Drush commands.
     profile: minimal                                                # Which profile to use when installing Drupal.
     install_db: dr7.sql                                             # When set, will use the minimal profile then import this DB.
     sites_subdir: mysite                                            # Subdirectory of sites/ in which this site resides.
