@@ -43,8 +43,33 @@ class BuildConfiguration implements ConfigurationInterface
                     ->defaultNull()
                 ->end()
                 ->scalarNode("sites_subdir")->end()
-                ->scalarNode("make")->end()
-                ->scalarNode("make_path")->end()
+
+                ->arrayNode("make")
+                    ->beforeNormalization()
+                    // If 'make' is a string, use this as the 'file' child.
+                    ->ifString()
+                        ->then(
+                            function ($v) {
+                                return array('file' => $v);
+                            }
+                        )
+                    ->end()
+                    ->children()
+                        ->scalarNode("file")
+                            ->isRequired()
+                        ->end()
+                        ->scalarNode("path")->end()
+                        // options is a set of key-value pairs where
+                        // the key is the make option name and value is the
+                        // make option value.
+                        ->arrayNode("options")
+                            // make sure hyphens are preserved.
+                            ->normalizeKeys(false)
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+
                 ->arrayNode("sites")
                     ->prototype("scalar")->end()
                 ->end()

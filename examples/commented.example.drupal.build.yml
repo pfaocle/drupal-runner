@@ -9,7 +9,14 @@ build:
     install_db: dr7.sql                                             # When set, will use the minimal profile then import this DB.
     sites_subdir: mysite                                            # Subdirectory of sites/ in which this site resides.
     make: make/mysite.make                                          # Location of make file relative to sites subdirectory.
-    make_path: profiles/myprofile                                   # Optional path to the make file, if not in the sites subdirectory.
+
+# Alternatively, you specify extra make parameters.
+    make:
+        file: make/mysite.make                                      # Location of make file relative to sites subdirectory.
+        path: profiles/myprofile                                    # Optional path to the make file, if not in the sites subdirectory.
+        options:                                                    # Array of make options (see drush help make).
+            contrib-destination: "sites/all"
+
     sites:                                                          # These sites patterns will be added to $sites.php
         - 8080.mysite.drupal.dev                                    #   and pointed to the main sites-subdir.
         - mysite.stage.example.com
