@@ -81,17 +81,27 @@ class DrupalBuild
 
     /**
      * Constructor - initialise configuration.
+     *
+     * @param null|array $config
+     *   If set, create a DrupalBuild with the given configuration.
      */
-    public function __construct()
+    public function __construct($config = null)
     {
-        $this->loadConfig();
+        if ($config == null) {
+            $this->config = $this->loadConfig();
+        } else {
+            $this->config = $config;
+        }
     }
 
     /**
-     * Loads the build configuration fully into $this->config
+     * Loads and returns the build configuration.
+     *
+     * @return array
+     *   The processed, validated configuration.
      *
      * @throws InvalidConfigurationException
-     *   If build configuration doesn't validate
+     *   If build configuration doesn't validate.
      */
     protected function loadConfig()
     {
@@ -107,7 +117,7 @@ class DrupalBuild
         $configuration = new BuildConfiguration();
 
         // Configuration, validated. Will throw an InvalidConfigurationException if the configuration is invalid.
-        $this->config = $processor->processConfiguration($configuration, $configValues);
+        return $processor->processConfiguration($configuration, $configValues);
     }
 
     /**
@@ -128,7 +138,7 @@ class DrupalBuild
     {
         // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
-            $this->loadConfig();
+            $this->config = $this->loadConfig();
         }
 
         // If $key == null, we want the entire section.
