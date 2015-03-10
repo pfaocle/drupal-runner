@@ -5,3 +5,7 @@
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
+-   repo: git://github.com/hootsuite/pre-commit-php.git
+    sha: '1.0.0'
+    hooks:
+    -   id: php-lint
