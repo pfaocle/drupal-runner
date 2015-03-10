@@ -13,9 +13,6 @@ use Robo\Task\FileSystem;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class DrupalBuild.
