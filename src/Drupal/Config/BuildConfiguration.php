@@ -59,11 +59,10 @@ class BuildConfiguration implements ConfigurationInterface
                             ->isRequired()
                         ->end()
                         ->scalarNode("path")->end()
-                        // options is a set of key-value pairs where
-                        // the key is the make option name and value is the
+                        // 'options' is a set of key-value pairs where the key is the make option name and value is the
                         // make option value.
                         ->arrayNode("options")
-                            // make sure hyphens are preserved.
+                            // Make sure hyphens are preserved.
                             ->normalizeKeys(false)
                             ->prototype('scalar')->end()
                         ->end()
