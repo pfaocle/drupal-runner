@@ -27,26 +27,61 @@ particular way. Specifically:
   as a dependency.
 * It _must_ contain a **RoboFile.php** files containing (at least) an empty
   `Robofile` class which extends `DrupalRunner`
+* It _must_ contain a makefile to use with [Drush Make](http://docs.drush.org/en/stable/make/).
 
 You get can started quickly by referring to one of the full example builds
-listed below. However, if you want to start from scratch:
+listed below. Otherwise, check out _"Creating a build from scratch"_ if you
+want more details or wish to configure everything ground up.
 
-1. Initialise a [Robo installation using Composer](https://github.com/Codegyre/Robo/blob/master/README.md#installing).
-2. Create a **composer.json** file.
-3. Add Add `https://bitbucket.org/pfaocle/drupal-runner.git` as a VCS repository
-   in **composer.json**
-4. Add `pfaocle/drupal-runner` as a dependency in **composer.json**
-5. Run `composer install`
-6. Edit **RoboFile.php** and extend the `DrupalRunner` class, instead of
+
+Build configuration
+-------------------
+A site's "build" is defined by the project's **drupal.build.yml** file.
+
+All of the build configuration options are detailed in the example configuration
+file **examples/commented.example.drupal.build.yml**
+
+
+Usage
+-----
+Run `vendor/bin/robo list` to see the Drupal tasks available. To run a complete
+build:
+
+    # From your Drupal document root:
+    cd sites/your-site
+
+    # You should now be in the site subdirectory and the root directory of your
+    # repository.
+    vendor/bin/robo drupal:magic ../..
+
+
+Build examples
+--------------
+There are a few build examples available in the **examples/** directory. Full
+build examples, for reference or to add to, are also available on GitHub:
+
+* [d7-drupal-runner-example](https://github.com/pfaocle/d7-drupal-runner-example) - a minimal, vanilla Drupal 7 build.
+* [panopoly-drupal-runner-example](https://github.com/pfaocle/panopoly-drupal-runner-example) - Panopoly-based Drupal 7.
+* [openpublic-drupal-runner-example](https://github.com/pfaocle/openpublic-drupal-runner-example) - OpenPublic-based Drupal 7 build.
+
+
+Creating a build from scratch
+-----------------------------
+1. Create a **composer.json** file and add:
+    * `https://bitbucket.org/pfaocle/drupal-runner.git` as a VCS repository
+    * `pfaocle/drupal-runner` as a dependency
+2. Run `composer install`
+3. Run `vendor/bin/robo` to create **RoboFile.php**
+4. Edit **RoboFile.php** and extend the `DrupalRunner` class, instead of
    `\Robo\Tasks` (see the example below).
-7. Create your **drupal.build.yml** configuration, or copy one of the examples
+5. Create your **drupal.build.yml** configuration, or copy one of the examples
    and edit it to your needs.
 
 ### Example composer.json
 
     {
-        "name": "pfaocle/robo-drupal-testing",
-        "description": "Testing set-up for Drupal Runner.",
+        "name": "pfaocle/my-d7-site",
+        "description": "Example set-up for Drupal Runner.",
 
         "repositories": [
             {
@@ -70,40 +105,9 @@ listed below. However, if you want to start from scratch:
 
     require 'vendor/autoload.php';
 
-    use Robo\DrupalRunner;
-
-    class Robofile extends DrupalRunner
+    class Robofile extends Robo\DrupalRunner
     {
     }
-
-
-Build configuration
--------------------
-A site's "build" is defined by the project's **drupal.build.yml** file.
-
-All of the build configuration options are detailed in the example configuration
-file **examples/commented.example.drupal.build.yml**
-
-
-Usage
------
-Run `vendor/bin/robo list` to see the Drupal tasks available. To run a complete
-build:
-
-    # From your Drupal docroot:
-    cd sites/your-site
-    # This should now be the root of your repository.
-    vendor/bin/robo drupal:magic ../..
-
-
-Build examples
--------------------
-There are a few build examples available in the **examples/** directory. Full
-build examples, for reference or to add to, are also available on GitHub:
-
-* [d7-drupal-runner-example](https://github.com/pfaocle/d7-drupal-runner-example) - a minimal, vanilla Drupal 7 build.
-* [panopoly-drupal-runner-example](https://github.com/pfaocle/panopoly-drupal-runner-example) - Panopoly-based Drupal 7.
-* [openpublic-drupal-runner-example](https://github.com/pfaocle/openpublic-drupal-runner-example) - OpenPublic-based Drupal 7 build.
 
 
 Running tests
