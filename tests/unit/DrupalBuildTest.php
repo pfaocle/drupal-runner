@@ -14,6 +14,14 @@ class DrupalBuildTest extends \Codeception\TestCase\Test
     protected $tester;
 
     /**
+     * Test expected constants are available.
+     */
+    public function testExpectedConstantsAreAvailable()
+    {
+        $this->assertNotEmpty(DrupalBuild::BUILD_CONFIG_FILE);
+    }
+
+    /**
      * Test expected public statics are available.
      */
     public function testExpectedPublicStaticVariablesAreAvailable()
@@ -31,7 +39,7 @@ class DrupalBuildTest extends \Codeception\TestCase\Test
      */
     public function seeExpectedExceptionAsConfigCannotBeRead()
     {
-        $this->setExpectedException("Exception", "Build configuration could not be found.");
+        $this->setExpectedException("Exception", 'The file "drupal.build.yml" does not exist');
         new DrupalBuild();
     }
 }

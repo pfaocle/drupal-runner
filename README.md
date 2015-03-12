@@ -33,9 +33,8 @@ incompatible with versions 0.4.6, 0.4.7 and any 0.5.x releases**.
 
 Configuration
 -------------
-Check `example.drupal.build.yml` for more details. You will need to copy this
-file to `drupal.build.yml` in your Robo installation directory and edit
-according to your needs.
+All of the build configuration options are detailed in the example configuration
+file `examples/commented.example.drupal.build.yml`.
 
 Usage
 -----
@@ -61,7 +60,8 @@ Usage
 
 More build examples
 -------------------
-There are a few build examples available, for reference or to add to:
+There are a few build examples available in the `examples` directory. Full
+build examples, for reference or to add to, are also available on GitHub:
 
 * [d7-drupal-runner-example](https://github.com/pfaocle/d7-drupal-runner-example) - a minimal, vanilla Drupal 7 build.
 * [panopoly-drupal-runner-example](https://github.com/pfaocle/panopoly-drupal-runner-example) - Panopoly-based Drupal 7.

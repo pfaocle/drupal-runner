@@ -1,0 +1,25 @@
+#
+# Drupal Runner Codeception build test suite configuration.
+#
+# This suite will run against the built dr7 site after Drupal Runner has finished building. It uses a mixture of
+# browser-based tests (with PhpBrowser) and database verifications (with Db module).
+#
+class_name: BuildTester
+modules:
+    enabled: [BuildHelper, Db, PhpBrowser]
+    config:
+        Db:
+            populate: false
+            cleanup: false
+        PhpBrowser:
+            url: 'http://dr7.drupal.dev:8080'
+
+env:
+    # Override Db module configuration to run on local.
+    local:
+        modules:
+            config:
+                Db:
+                    dsn: 'mysql:host=33.33.33.10;dbname=dr7'
+                    user: 'root'
+                    password: 'root'

@@ -6,9 +6,13 @@
 
 namespace Robo\Drupal;
 
+use Robo\Drupal\Config\BuildConfiguration;
+use Robo\Drupal\Config\YamlBuildLoader;
 use Robo\Task\Exec;
 use Robo\Task\FileSystem;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * Class DrupalBuild.
@@ -19,6 +23,11 @@ class DrupalBuild
 {
     use Exec;
     use FileSystem;
+
+    /**
+     * Name of the build configuration file.
+     */
+    const BUILD_CONFIG_FILE = "drupal.build.yml";
 
     /**
      * @var array
@@ -57,7 +66,7 @@ class DrupalBuild
 
     /**
      * @var array
-     *   Stores the build configuration.
+     *   Stores the build configuration, as loaded and validated by symfony/config
      */
     protected $config;
 
@@ -69,77 +78,79 @@ class DrupalBuild
 
     /**
      * Constructor - initialise configuration.
+     *
+     * @param null|array $config
+     *   If set, create a DrupalBuild with the given configuration.
      */
-    public function __construct()
+    public function __construct($config = null)
     {
-        $this->config();
+        if ($config == null) {
+            $this->config = $this->loadConfig();
+        } else {
+            $this->config = $config;
+        }
     }
 
     /**
      * Loads and returns the build configuration.
      *
-     * @param string $section
-     *   The section of configuration to load/return.
-     * @param bool $refresh
-     *   Load in config from file.
-     *
      * @return array
-     *   Parsed YAML configuration for $section, or the full configuration if $section not set.
+     *   The processed, validated configuration.
      *
-     * @throws \Exception
+     * @throws InvalidConfigurationException
+     *   If build configuration doesn't validate.
      */
-    public function config($section = '', $refresh = false)
+    protected function loadConfig()
     {
-        $validConfig = array(
-            'Build',
-            'Site',
-            'Database',
-            'Pre',
-            'Features',
-            'Migrate',
-            'Post',
-        );
+        $configDirectories = array(getcwd());
+        $locator = new FileLocator($configDirectories);
 
-        if (!empty($section) && !in_array($section, $validConfig)) {
-            throw new \Exception($section . ' is not a valid build configuration section,');
-        }
+        // Convert the config file into an array.
+        $loader = new YamlBuildLoader($locator);
+        $configValues = $loader->load($locator->locate(self::BUILD_CONFIG_FILE));
 
-        // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
-        if ($refresh || empty($this->config)) {
-            $configFile = getcwd() . '/drupal.build.yml';
-            if (!file_exists($configFile)) {
-                throw new \Exception('Build configuration could not be found.');
-            }
-            $this->config = Yaml::parse(file_get_contents($configFile));
-        }
+        // Process the array using the defined configuration.
+        $processor = new Processor();
+        $configuration = new BuildConfiguration();
 
-        if (!empty($section)) {
-            if (array_key_exists($section, $this->config)) {
-                return $this->config[$section];
-            }
-        } else {
-            return $this->config;
-        }
-
-        // Always return an array (for a valid section) and let the caller handle empty configuration.
-        return array();
+        // Configuration, validated. Will throw an InvalidConfigurationException if the configuration is invalid.
+        return $processor->processConfiguration($configuration, $configValues);
     }
 
     /**
      * Returns an individual piece of build configuration.
      *
      * @param string $section
-     *   The section of configuration, e.g. 'Build', 'Site' etc.
+     *   The section of configuration to return, or in which the given $key is. For example, 'site', 'pre', etc.
+     *   Defaults to 'build', returning the entire (top-level) configuration tree.
      * @param string $key
-     *   The key of the configuration element to get.
+     *   The key of the configuration element to get. If null the entire $section of configuration is returned.
+     * @param bool $refresh
+     *   Load in config from file.
      *
-     * @return mixed
-     *   The value of the configuration key, or null if not found.
+     * @return array|string|null
+     *   An array of parsed configuration for $section, the value of the configuration $key, or null if not found.
      */
-    public function getConfig($section, $key)
+    public function config($section = "build", $key = null, $refresh = false)
     {
-        $sectionConfig = $this->config($section);
-        return isset($sectionConfig[$key]) ? $sectionConfig[$key] : null;
+        // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
+        if ($refresh || empty($this->config)) {
+            $this->config = $this->loadConfig();
+        }
+
+        // If $key == null, we want the entire section.
+        if (is_null($key)) {
+            return $section === "build" ? $this->config : $this->config[$section];
+        }
+
+        // If no $section is passed, 'build' is assumed. A key in the 'build' section is actually in the root of the
+        // configuration tree.
+        if ($section == "build") {
+            return $this->config[$key];
+        }
+
+        // Otherwise we want a $key in a specific sub-section of configuration.
+        return $this->config[$section][$key];
     }
 
     /**
@@ -164,9 +175,7 @@ class DrupalBuild
      */
     public function writeSitesPhpFile()
     {
-        $buildConfig = $this->config('Build');
-
-        if (isset($buildConfig['sites']) && count($buildConfig['sites']) > 0) {
+        if (isset($this->config['sites']) && count($this->config['sites']) > 0) {
             $sitesFilePath = $this->path('sites/sites.php');
 
             // @todo Template, or combine these two tasks into one write?
@@ -176,7 +185,7 @@ class DrupalBuild
 
             $this->taskReplaceInFile($sitesFilePath)
                 ->from('%sites')
-                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $buildConfig['sites'])))
+                ->to(implode("\n  ", array_map(array($this, 'sitesFileLineCallback'), $this->config['sites'])))
                 ->run();
         }
     }
@@ -192,8 +201,7 @@ class DrupalBuild
      */
     protected function sitesFileLineCallback($hostnamePattern)
     {
-        $buildConfig = $this->config('Build');
-        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $buildConfig['sites-subdir']);
+        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $this->config['sites_subdir']);
     }
 
     /**
@@ -201,8 +209,6 @@ class DrupalBuild
      */
     public function writeEnvironmentSettings()
     {
-        $buildConfig = $this->config('Build');
-
         // Include settings.$env.php
         $env = 'local';
         $envSettings = <<<EOS
@@ -214,7 +220,7 @@ if (file_exists(conf_path() . '/settings.$env.php')) {
 EOS;
 
         // Write the inclusion of environment specific configuration to main settings.php file.
-        $settingsFilePath = "sites/{$buildConfig['sites-subdir']}/settings.php";
+        $settingsFilePath = "sites/{$this->config['sites_subdir']}/settings.php";
         $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
 
         $this->taskWriteToFile($this->path($settingsFilePath))
@@ -230,10 +236,8 @@ EOS;
      */
     public function cleanBuildDirectory()
     {
-        $buildConfig = $this->config('Build');
-
         // If the sites subdirectory exists, it may have no write permissions for any user.
-        $sitesSubdirPath = $this->path('sites/' . $buildConfig['sites-subdir']);
+        $sitesSubdirPath = $this->path('sites/' . $this->config['sites_subdir']);
         if (file_exists($sitesSubdirPath)) {
             $this->taskExec("cd {$this->path()} && chmod u+w $sitesSubdirPath")->run();
         }

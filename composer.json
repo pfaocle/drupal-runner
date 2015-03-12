@@ -19,7 +19,8 @@
         "php": ">=5.4.0",
         "codegyre/robo": "0.4.5",
         "boedah/robo-drush": "1.0.*",
-        "symfony/yaml": "*"
+        "symfony/yaml": "*",
+        "symfony/config": "~2.6"
     },
 
     "require-dev": {

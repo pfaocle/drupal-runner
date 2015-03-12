@@ -1,0 +1,79 @@
+#
+# Example Drupal Runner build configuration, using ALL the options.
+#
+
+build:
+    git: git@example.com:example/example-project/example-repo.git   # Path to read-accessible Git repository.
+    drush_alias: "@site.dev"                                        # Alias used to run remote Drush commands.
+    profile: minimal                                                # Which profile to use when installing Drupal.
+    install_db: dr7.sql                                             # When set, will use the minimal profile then import this DB.
+    sites_subdir: mysite                                            # Subdirectory of sites/ in which this site resides.
+    make: make/mysite.make                                          # Location of make file relative to sites subdirectory.
+
+# Alternatively, you specify extra make parameters.
+    make:
+        file: make/mysite.make                                      # Location of make file relative to sites subdirectory.
+        path: profiles/myprofile                                    # Optional path to the make file, if not in the sites subdirectory.
+        options:                                                    # Array of make options (see drush help make).
+            contrib-destination: "sites/all"
+
+    sites:                                                          # These sites patterns will be added to $sites.php
+        - 8080.mysite.drupal.dev                                    #   and pointed to the main sites-subdir.
+        - mysite.stage.example.com
+        - mysite.prod.example.com
+
+    # Site details - name and root user credentials.
+    site:
+        site_name: My Site                                          # Site name.
+        root_username: root                                         # 'Root' user name (uid = 1).
+        root_password: root                                         # 'Root' user password.
+        theme: bootstrap_mysite                                     # Theme to enable and set as default. Bartik will be disabled.
+
+    # Database details.
+    database:
+        db_name: dbname                                             # Default database name.
+        db_username: root                                           # Database username.
+        db_password: password                                       # Database password.
+
+    # Pre-steps.
+    pre:
+        modules:                                                    # Modules to enable before anything else.
+            - mysite_block_install
+            - features
+            - mysite_controller
+            - mysite_dev
+            - mysite_deploy
+        commands:                                                   # Drush commands to run before anything else.
+            - vset views_ui_show_master_display 1
+            - vset views_ui_show_advanced_help_warning 0
+
+    # Features to enable.
+    features:
+        - mysite_contact_form
+        - mysite_content_type
+
+    # Migration.
+    migrate:
+        # Note we assume that Migrate and Migrate UI are required.
+        dependencies:
+            - migrate_d2d
+            - migrate_extras
+            - migrate_mysite                                        # Your custom migration module/classes.
+        source:
+            files:
+                variable: mysite_file_migration                     # File migrations can use this to set source files path.
+                dir: /var/www/vhosts/mysite-old.drupal.dev/files    # Provide the path to the source files folder.
+        groups:                                                     # We can migrate groups, in order...
+            - users
+            - terms
+            - default
+        migrations:                                                 # ... and/or also run individual migrations, in order.
+            - Roles
+            - Users
+
+    # Post-steps.
+    post:
+        commands:                                                   # Drush commands to run after we're finished.
+            - en mysite_menus                                       # Install menus after migration, for example.
+            - sqlq "UPDATE block SET status = 0 WHERE module != 'system' OR delta != 'main'"
+            - dis mysite_block_install                              # This module might be hidden from the UI.
