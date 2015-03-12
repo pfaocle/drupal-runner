@@ -66,3 +66,22 @@ build examples, for reference or to add to, are also available on GitHub:
 * [d7-drupal-runner-example](https://github.com/pfaocle/d7-drupal-runner-example) - a minimal, vanilla Drupal 7 build.
 * [panopoly-drupal-runner-example](https://github.com/pfaocle/panopoly-drupal-runner-example) - Panopoly-based Drupal 7.
 * [openpublic-drupal-runner-example](https://github.com/pfaocle/openpublic-drupal-runner-example) - OpenPublic-based Drupal 7 build.
+
+Running tests
+-------------
+There is a [Codeception](http://codeception.com/) based test suite available, containing:
+
+* a set of unit tests for various classes; and
+* a "build" test suite which runs against a built copy of [dr7-drupal-runner-example](https://github.com/pfaocle/dr7-drupal-runner-example)
+
+To run tests:
+
+    # Ensure *Tester classes are built.
+    codecept build
+
+    # Run all unit tests and write out coverage report.
+    codecept run unit --coverage-html
+
+    # If the dr7 site is available locally, ensure tests/build.suite.yml is
+    # configured correctly and run the "build" suite against it.
+    codecept run build --env=local
