@@ -22,17 +22,6 @@ class DrupalBuildTest extends \Codeception\TestCase\Test
     }
 
     /**
-     * Test expected public statics are available.
-     */
-    public function testExpectedPublicStaticVariablesAreAvailable()
-    {
-        $this->assertNotEmpty(DrupalBuild::$drupalHiddenFiles);
-        $this->assertNotEmpty(DrupalBuild::$unwantedFilesPatterns);
-        $this->assertNotEmpty(DrupalBuild::$sitesFileLinePattern);
-        $this->assertNotEmpty(DrupalBuild::$drupalDefaultTheme);
-    }
-
-    /**
      * Instantiating this class currently tries to load configuration, which will throw an exception here.
      *
      * @test
