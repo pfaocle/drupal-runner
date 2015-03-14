@@ -6,7 +6,7 @@
 #
 class_name: BuildTester
 modules:
-    enabled: [BuildHelper, Db, PhpBrowser]
+    enabled: [BuildHelper, Db, Filesystem, PhpBrowser]
     config:
         Db:
             populate: false
