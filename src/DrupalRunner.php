@@ -406,25 +406,20 @@ class DrupalRunner extends Tasks
      * @param string $type
      *   The type of steps to run, either 'pre' or 'post'.
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     protected function runSteps($type)
     {
         if ('pre' != $type && 'post' != $type) {
-            throw new \Exception("$type is not a valid step type.");
+            throw new \RuntimeException("$type is not a valid step type.");
         }
 
         $stepsConfig = $this->build->config($type);
-        if ($stepsConfig["enabled"]) {
-            foreach ($stepsConfig["commands"] as $cmd) {
-                $this->taskDrushStack()
-                    ->siteAlias($this->build->config('build', 'drush_alias'))
-                    ->exec($cmd)
-                    ->run();
-            }
-        }
-        if ($stepsConfig["enabled"]) {
-            $this->enableModuleList($stepsConfig['modules']);
+        foreach ($stepsConfig as $cmd) {
+            $this->taskDrushStack()
+                ->siteAlias($this->build->config('build', 'drush_alias'))
+                ->exec($cmd)
+                ->run();
         }
     }
 
