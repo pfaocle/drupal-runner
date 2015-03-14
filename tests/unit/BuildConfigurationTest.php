@@ -46,25 +46,7 @@ class BuildConfigurationTest extends \Codeception\TestCase\Test
         );
         $this->assertInstanceOf(
             '\Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition',
-            $this->buildConfig->addPreOrPostSteps("pre")
-        );
-        $this->assertInstanceOf(
-            '\Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition',
-            $this->buildConfig->addPreOrPostSteps("post")
-        );
-        $this->assertInstanceOf(
-            '\Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition',
             $this->buildConfig->addMigrateSection()
         );
-    }
-
-    /**
-     * Test the addPreOrPostSteps() method throws an exception when given an invalid "step" value.
-     */
-    public function testAddPreOrPostStepsThrowsExeptionWhenStepsStringIsInvalid()
-    {
-        $step = "rubbish";
-        $this->setExpectedException('\Exception', "$step is not a valid build step, must be 'pre' or 'post'.");
-        $this->buildConfig->addPreOrPostSteps($step);
     }
 }
