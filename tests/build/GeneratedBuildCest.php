@@ -8,6 +8,19 @@ use \BuildTester;
 class GeneratedBuildCest
 {
     /**
+     * The path to the dr7 site subdirectory, relative to the Codeception project root.
+     *
+     * We assume the tests are being run within Drupal Runner's vendor directory, underneath an installation of the dr7
+     * test site, i.e. we are running something like:
+     *
+     *     cd /path/to/webroot/sites/dr7/vendor/pfaocle/drupal-runner
+     *     ../../bin/codecept run build
+     *
+     * @see http://codeception.com/docs/modules/Filesystem
+     */
+    const SITES_SUBDIRECTORY_PATH = "../../..";
+
+    /**
      * @var BuildTester
      *   Store the Tester object being used to test.
      */
@@ -23,23 +36,16 @@ class GeneratedBuildCest
      */
     public function testFilesWrittenDuringBuild(BuildTester $I)
     {
-        // @todo Sort this - we assume the tests are being run within Drupal
-        // Runner's vendor directory, underneath an installation of the dr7
-        // test site, i.e. we are running something like:
-        //
-        // cd /path/to/webroot/sites/dr7/vendor/pfaocle/drupal-runner
-        // ../../bin/codecept run...
-        $pathToSitesSubDirectory = "../../..";
-
         $this->tester = $I;
+
         $this->fileContentsHelper(
             "sites.php",
-            $pathToSitesSubDirectory . DIRECTORY_SEPARATOR . "..",
+            self::SITES_SUBDIRECTORY_PATH . DIRECTORY_SEPARATOR . "..",
             $this->sitesFileContents()
         );
         $this->fileContentsHelper(
             "settings.php",
-            $pathToSitesSubDirectory,
+            self::SITES_SUBDIRECTORY_PATH,
             $this->settingsFileLocalSettingsContent()
         );
 
