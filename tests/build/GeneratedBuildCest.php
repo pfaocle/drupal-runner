@@ -31,32 +31,16 @@ class GeneratedBuildCest
         // ../../bin/codecept run...
         $pathToSitesSubDirectory = "../../..";
 
-        // Define the expected contents of sites.php
-        $sitesFileContents = <<<EOS
-<?php
-  \$sites['8080.dr7.drupal.dev'] = 'dr7';
-  \$sites['dr7.stage.example.com'] = 'dr7';
-  \$sites['dr7.prod.example.com'] = 'dr7';
-EOS;
-
-        // Define the expected contents of settings.php
-        $settingsFileLocalSettingsContent = <<<EOS
-// Include environment specific settings.
-if (file_exists(conf_path() . '/settings.local.php')) {
-  include_once 'settings.local.php';
-}
-EOS;
-
         $this->tester = $I;
         $this->fileContentsHelper(
             "sites.php",
             $pathToSitesSubDirectory . DIRECTORY_SEPARATOR . "..",
-            $sitesFileContents
+            $this->sitesFileContents()
         );
         $this->fileContentsHelper(
             "settings.php",
             $pathToSitesSubDirectory,
-            $settingsFileLocalSettingsContent
+            $this->settingsFileLocalSettingsContent()
         );
 
     }
@@ -78,5 +62,40 @@ EOS;
         $I->seeFileFound($filename, $path);
         $I->openFile($path . DIRECTORY_SEPARATOR . $filename);
         $I->seeInThisFile($content);
+    }
+
+    /**
+     * Define the expected contents of sites.php
+     *
+     * @return string
+     *   The completed, expected contents of sites.php as written by the dr7 test site.
+     */
+    private function sitesFileContents()
+    {
+        $sitesFileContents = <<<EOS
+<?php
+  \$sites['8080.dr7.drupal.dev'] = 'dr7';
+  \$sites['dr7.stage.example.com'] = 'dr7';
+  \$sites['dr7.prod.example.com'] = 'dr7';
+EOS;
+        return $sitesFileContents;
+    }
+
+    /**
+     * Define the expected contents of settings.php
+     *
+     * @return string
+     *   A snippet of PHP used by Drupal Runner to include local settings.
+     */
+    private function settingsFileLocalSettingsContent()
+    {
+        $settingsFileLocalSettingsContent = <<<EOS
+// Include environment specific settings.
+if (file_exists(conf_path() . '/settings.local.php')) {
+  include_once 'settings.local.php';
+}
+
+EOS;
+        return $settingsFileLocalSettingsContent;
     }
 }
