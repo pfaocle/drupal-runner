@@ -52,6 +52,26 @@ class GeneratedBuildCest
     }
 
     /**
+     * Regression/bug test for repeated inclusion of local settings in settings.php
+     *
+     * Drupal Runner currently repeatedly appends the "local settings" snippet of PHP to the end of the settings.php
+     * file for the build, if the file already exists and contains the string from a previous build.
+     *
+     * @group bug
+     *
+     * @param BuildTester $I
+     *   The Tester object being used to test.
+     */
+    public function testSettingsFileDoesntContainLocalSettingsSnippetMoreThanOnce(BuildTester $I)
+    {
+        $pathToSitesSubDirectory = "../../..";
+        $I->openFile($pathToSitesSubDirectory . DIRECTORY_SEPARATOR . "settings.php");
+        // Join two strings containing the local settings snippet together and ensure settings.php DOES NOT contain it.
+        $content = $this->settingsFileLocalSettingsContent() . $this->settingsFileLocalSettingsContent();
+        $I->dontSeeInThisFile($content);
+    }
+
+    /**
      * Helper to check for a given file, open it and check its contents.
      *
      * @param string $filename
