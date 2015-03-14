@@ -102,7 +102,9 @@ class BuildConfiguration implements ConfigurationInterface
                 ->end()
 
                 // Pre steps.
-                ->append($this->addPreOrPostSteps("pre"))
+                ->arrayNode("pre")
+                    ->prototype("scalar")->end()
+                ->end()
 
                 // Enable Features modules.
                 ->arrayNode("features")
@@ -113,46 +115,13 @@ class BuildConfiguration implements ConfigurationInterface
                 ->append($this->addMigrateSection())
 
                 // Post steps.
-                ->append($this->addPreOrPostSteps("post"))
+                ->arrayNode("post")
+                    ->prototype("scalar")->end()
+                ->end()
             ->end()
         ;
 
         return $treeBuilder;
-    }
-
-    /**
-     * Build and return a 'pre' or 'post' step configuration node.
-     *
-     * @param string $step
-     *   The step to build, either 'pre' or 'post'.
-     *
-     * @return ArrayNodeDefinition|NodeDefinition
-     *   The built node definition.
-     *
-     * @throws \Exception
-     */
-    public function addPreOrPostSteps($step)
-    {
-        if ($step != "pre" && $step != 'post') {
-            throw new \Exception("$step is not a valid build step, must be 'pre' or 'post'.");
-        }
-
-        $builder = new TreeBuilder();
-        $node = $builder->root($step);
-
-        $node
-            ->canBeEnabled()
-            ->children()
-                ->arrayNode("modules")
-                    ->prototype("scalar")->end()
-                ->end()
-                ->arrayNode("commands")
-                    ->prototype("scalar")->end()
-                ->end()
-            ->end()
-        ;
-
-        return $node;
     }
 
     /**
