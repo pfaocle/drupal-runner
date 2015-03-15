@@ -118,6 +118,7 @@ EOS;
     private function settingsFileLocalSettingsContent()
     {
         $settingsFileLocalSettingsContent = <<<EOS
+
 // Include environment specific settings.
 if (file_exists(conf_path() . '/settings.local.php')) {
   include_once 'settings.local.php';
