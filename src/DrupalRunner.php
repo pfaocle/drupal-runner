@@ -189,8 +189,11 @@ class DrupalRunner extends Tasks
             ->siteAlias($this->build->config('build', 'drush_alias'))
             ->dbUrl(sprintf(
                 DrupalBuild::DRUPAL_DB_URL_SYNTAX,
+                $db['schema'],
                 $db['db_username'],
                 $db['db_password'],
+                $db['host'],
+                $db['port'],
                 $db['db_name']
             ))
             ->sitesSubdir($config['sites_subdir'])

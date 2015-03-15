@@ -32,7 +32,7 @@ class DrupalBuild
     /**
      * The format of the database URL passed to drush site-install
      */
-    const DRUPAL_DB_URL_SYNTAX = "mysql://%s:%s@localhost/%s";
+    const DRUPAL_DB_URL_SYNTAX = "%s://%s:%s@%s:%d/%s";
 
     /**
      * @var array
