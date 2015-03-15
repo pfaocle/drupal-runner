@@ -65,28 +65,6 @@ build examples, for reference or to add to, are also available on GitHub:
 * [openpublic-drupal-runner-example](https://github.com/pfaocle/openpublic-drupal-runner-example) - OpenPublic-based Drupal 7 build.
 
 
-Using other Robo tasks with Drupal Runner
------------------------------------------
-It may be that your Drupal 7 site build already uses, or will soon use,
-"vanilla" Robo for other development tasks. This is still possible by adding
-your own custom methods to **RoboFile.php**, as usual. For example, it may
-contain custom commands for running site functional or acceptance tests:
-
-    class Robofile extends DrupalRunner
-    {
-        public function testsFunctional()
-        {
-            $this->taskCodecept("vendor/bin/codecept")
-                ->suite("functional")
-                ->run();
-        }
-    }
-
-Running Robo will list both sets of commands: those provided by Drupal Runner
-(such as **drupal:magic**) and any custom commands you define directly in
-**RoboFile.php**
-
-
 Creating a build from scratch
 -----------------------------
 1. Create a **composer.json** file and add:
@@ -130,6 +108,28 @@ Creating a build from scratch
     class Robofile extends Robo\DrupalRunner
     {
     }
+
+
+Using other Robo tasks with Drupal Runner
+-----------------------------------------
+It may be that your Drupal 7 site build already uses, or will soon use,
+"vanilla" Robo for other development tasks. This is still possible by adding
+your own custom methods to **RoboFile.php**, as usual. For example, it may
+contain custom commands for running site functional or acceptance tests:
+
+    class Robofile extends DrupalRunner
+    {
+        public function testsFunctional()
+        {
+            $this->taskCodecept("vendor/bin/codecept")
+                ->suite("functional")
+                ->run();
+        }
+    }
+
+Running Robo will list both sets of commands: those provided by Drupal Runner
+(such as **drupal:magic**) and any custom commands you define directly in
+**RoboFile.php**
 
 
 Running tests
