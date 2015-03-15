@@ -86,7 +86,7 @@ class BuildConfiguration implements ConfigurationInterface
                 // Database details.
                 ->arrayNode("database")
                     ->children()
-                        ->enumNode("schema")
+                        ->enumNode("driver")
                             ->values(array("mysql", "pgsql", "sqlite"))
                             ->defaultValue("mysql")
                         ->end()
