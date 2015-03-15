@@ -54,8 +54,10 @@ class GeneratedBuildCest
     /**
      * Regression/bug test for repeated inclusion of local settings in settings.php
      *
-     * Drupal Runner currently repeatedly appends the "local settings" snippet of PHP to the end of the settings.php
-     * file for the build, if the file already exists and contains the string from a previous build.
+     * Fixed in commit f0a8fa8
+     *
+     * Prior to this fix, Drupal Runner would repeatedly append the "local settings" snippet of PHP to the settings.php
+     * file for the build, if the file already existed and contained the PHP snippet from a previous build.
      *
      * @group bug
      *
