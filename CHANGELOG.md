@@ -1,6 +1,18 @@
 Drupal Runner CHANGELOG
 =======================
 
+0.3.x - Configuration
+---------------------
+* [BUG] Do not append the 'local settings inclusion' PHP snippet in
+  settings.php if it's already there, e.g. from a previous build.
+* Collapse pre and post steps modules and commands into simply a list of
+  commands. Modules can still be enabled with by defining a command which calls
+  "pm-enable" (or its alias, "en").
+* Add php-lint as a pre-commit check.
+* Provide a new functional site suite called "build" which will test a built
+  dr7 test site.
+* Update the build configuration system to use symfony/config
+
 0.2.0 - Drush make command-line options
 ---------------------------------------
 * Allow the build.yml to specify make-options to pass to drush make command
