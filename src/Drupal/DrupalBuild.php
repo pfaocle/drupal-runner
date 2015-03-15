@@ -217,18 +217,20 @@ class DrupalBuild
 if (file_exists(conf_path() . '/settings.$env.php')) {
   include_once 'settings.$env.php';
 }
+
 EOS;
 
-        // Write the inclusion of environment specific configuration to main settings.php file.
+        // If the string is NOT already present in the file (e.g. from a previous build), write the inclusion of
+        // environment specific configuration to main settings.php file.
         $settingsFilePath = "sites/{$this->config['sites_subdir']}/settings.php";
-        $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
-
-        $this->taskWriteToFile($this->path($settingsFilePath))
-            ->text($envSettings)
-            ->append()
-            ->run();
-
-        $this->taskExec("chmod u-w {$this->path($settingsFilePath)}")->run();
+        if (strpos(file_get_contents($this->path($settingsFilePath)), $envSettings) === false) {
+            $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
+            $this->taskWriteToFile($this->path($settingsFilePath))
+                ->text($envSettings)
+                ->append()
+                ->run();
+            $this->taskExec("chmod u-w {$this->path($settingsFilePath)}")->run();
+        }
     }
 
     /**
