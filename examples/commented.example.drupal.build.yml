@@ -40,15 +40,13 @@ build:
 
     # Pre-steps.
     pre:
-        modules:                                                    # Modules to enable before anything else.
-            - mysite_block_install
-            - features
-            - mysite_controller
-            - mysite_dev
-            - mysite_deploy
-        commands:                                                   # Drush commands to run before anything else.
-            - vset views_ui_show_master_display 1
-            - vset views_ui_show_advanced_help_warning 0
+        - en mysite_block_install                                   # Run Drush commands before anything else.
+        - en features
+        - en mysite_controller
+        - en mysite_dev
+        - en mysite_deploy
+        - vset views_ui_show_master_display 1
+        - vset views_ui_show_advanced_help_warning 0
 
     # Features to enable.
     features:
@@ -76,7 +74,7 @@ build:
 
     # Post-steps.
     post:
-        commands:                                                   # Drush commands to run after we're finished.
-            - en mysite_menus                                       # Install menus after migration, for example.
-            - sqlq "UPDATE block SET status = 0 WHERE module != 'system' OR delta != 'main'"
-            - dis mysite_block_install                              # This module might be hidden from the UI.
+        - en mysite_menus                                       # Drush commands to run after we're finished, e.g.
+                                                                # installing menus after migration, or updating blocks.
+        - sqlq "UPDATE block SET status = 0 WHERE module != 'system' OR delta != 'main'"
+        - dis mysite_block_install                              # This module might be hidden from the UI.
