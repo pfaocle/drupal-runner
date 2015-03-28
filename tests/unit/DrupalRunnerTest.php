@@ -31,4 +31,23 @@ class DrupalRunnerTest extends \Codeception\TestCase\Test
         $this->assertNotEmpty(DrupalRunner::DEFAULT_GIT_REMOTE);
         $this->assertNotEmpty(DrupalRunner::GIT_CLEAN_MSG);
     }
+
+    /**
+     * Test a RuntimeException is thrown for an invalid "step type" (i.e. "pre" or "post").
+     */
+    public function testRunStepsThrowsExceptionIfStepsTypeIsInvalid()
+    {
+        $runner = new DrupalRunner();
+        $class = new \ReflectionClass($runner);
+        $method = $class->getMethod("runSteps");
+        $method->setAccessible(true);
+
+        $parameter = "this is invalid";
+        $this->setExpectedException("RuntimeException", sprintf("%s is not a valid step type.", $parameter));
+        $method->invokeArgs($runner, array($parameter));
+
+        $parameter = "";
+        $this->setExpectedException("RuntimeException", sprintf("%s is not a valid step type.", $parameter));
+        $method->invokeArgs($runner, array($parameter));
+    }
 }
