@@ -40,7 +40,7 @@ build:
 
     # Pre-steps.
     pre:
-        - en mysite_block_install                                   # Run Drush commands before anything else.
+        - en mysite_block_install                                   # Drush commands to run before anything else.
         - en features
         - en mysite_controller
         - en mysite_dev
