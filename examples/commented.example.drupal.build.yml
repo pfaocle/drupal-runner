@@ -31,9 +31,12 @@ build:
 
     # Database details.
     database:
+        driver: 'mysql'                                             # Database driver. One of mysql (default), pgsql or sqlite
         db_name: dbname                                             # Default database name.
         db_username: root                                           # Database username.
         db_password: password                                       # Database password.
+        host: 'localhost'                                           # Database host, defaults to "localhost".
+        port: 3306                                                  # Database port, defaults to 3306
 
     # Pre-steps.
     pre:

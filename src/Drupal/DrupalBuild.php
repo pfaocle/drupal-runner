@@ -30,6 +30,11 @@ class DrupalBuild
     const BUILD_CONFIG_FILE = "drupal.build.yml";
 
     /**
+     * The format of the database URL passed to drush site-install
+     */
+    const DRUPAL_DB_URL_SYNTAX = "%s://%s:%s@%s:%d/%s";
+
+    /**
      * @var array
      *   A list of Drupal's hidden files (to remove).
      */
