@@ -33,7 +33,8 @@ class BuildConfiguration implements ConfigurationInterface
                     ->isRequired()
                     ->cannotBeEmpty()
                     ->validate()
-                    ->ifTrue(function ($alias) { return substr($alias, 0, 1) !== "@";
+                    ->ifTrue(function ($alias) {
+                        return substr($alias, 0, 1) !== "@";
                     })
                         ->thenInvalid("Drush aliases must be specified with a leading @")
                     ->end()
