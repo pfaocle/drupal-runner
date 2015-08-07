@@ -21,6 +21,11 @@ class DrupalRunner extends Tasks
     use Drush;
 
     /**
+     * Drush command to run.
+     */
+    const DRUSH_COMMAND = 'drush';
+
+    /**
      * Default Git remote to use.
      */
     const DEFAULT_GIT_REMOTE = 'origin';
@@ -150,10 +155,13 @@ class DrupalRunner extends Tasks
 
         $this->taskExec(
             sprintf(
-                // Note that we need to change directory here, so don't wrap the path to make file in a call to
-                // path(). We also avoid using $this->drush() as currently this is run on the host machine.
-                "cd %s && drush -y make %s %s .",
+                // Note that we need to change directory here, so don't wrap
+                // the path to make file in a call to path(). We also avoid
+                // using $this->getTaskDrushStack() as currently this is run
+                // on the host machine.
+                "cd %s && %s -y make %s %s .",
                 escapeshellarg($this->build->path()),
+                self::DRUSH_COMMAND,
                 implode(" ", array_map("escapeshellarg", $options)),
                 escapeshellarg("$path/{$buildConfig['make']['file']}")
             )
@@ -186,9 +194,17 @@ class DrupalRunner extends Tasks
         }
 
         // Site install.
-        $this->taskDrushStack()
+        $this->getTaskDrushStack()
             ->siteAlias($this->build->config('build', 'drush_alias'))
-            ->dbUrl("mysql://{$db['db_username']}:{$db['db_password']}@localhost/{$db['db_name']}")
+            ->dbUrl(sprintf(
+                DrupalBuild::DRUPAL_DB_URL_SYNTAX,
+                $db['driver'],
+                $db['db_username'],
+                $db['db_password'],
+                $db['host'],
+                $db['port'],
+                $db['db_name']
+            ))
             ->sitesSubdir($config['sites_subdir'])
             ->siteName($site['site_name'])
             ->accountName($site['root_username'])
@@ -201,7 +217,7 @@ class DrupalRunner extends Tasks
 
             // Import DB. Note we drop the entire database here, as there could be tables in the minimal install
             // that aren't present in the imported SQL (nor are there any DROP TABLE x IF EXISTS... statements).
-            $this->taskDrushStack()
+            $this->getTaskDrushStack()
                 ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec('sql-drop')
                 ->exec('sql-cli < ' . $installDb)
@@ -245,7 +261,7 @@ class DrupalRunner extends Tasks
 
         // Enable theme, if set.
         if ($this->build->config('site', 'theme')) {
-            $this->taskDrushStack()
+            $this->getTaskDrushStack()
                 ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec('en ' . $this->build->config('site', 'theme'))
                 ->exec('vset theme_default  ' . $this->build->config('site', 'theme'))
@@ -266,7 +282,7 @@ class DrupalRunner extends Tasks
 
         if ($migrateConfig["enabled"]) {
             // We assume we'll want both Migrate UI and Migrate modules.
-            $this->taskDrushStack()
+            $this->getTaskDrushStack()
                 ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec('en migrate_ui')
                 ->run();
@@ -274,7 +290,7 @@ class DrupalRunner extends Tasks
             if (isset($migrateConfig['source']['files'])) {
                 $cmd = "vset {$migrateConfig['source']['files']['variable']} \\
                         \"{$migrateConfig['source']['files']['dir']}\"";
-                $this->taskDrushStack()
+                $this->getTaskDrushStack()
                     ->siteAlias($this->build->config('build', 'drush_alias'))
                     ->exec($cmd)
                     ->run();
@@ -283,7 +299,7 @@ class DrupalRunner extends Tasks
 
             if (isset($migrateConfig['dependencies'])) {
                 foreach ($migrateConfig['dependencies'] as $dependency) {
-                    $this->taskDrushStack()
+                    $this->getTaskDrushStack()
                         ->siteAlias($this->build->config('build', 'drush_alias'))
                         ->exec("en $dependency")
                         ->run();
@@ -292,7 +308,7 @@ class DrupalRunner extends Tasks
 
             if (isset($migrateConfig['groups'])) {
                 foreach ($migrateConfig['groups'] as $group) {
-                    $this->taskDrushStack()
+                    $this->getTaskDrushStack()
                         ->siteAlias($this->build->config('build', 'drush_alias'))
                         ->exec("mi --group=$group")
                         ->run();
@@ -301,7 +317,7 @@ class DrupalRunner extends Tasks
 
             if (isset($migrateConfig['migrations'])) {
                 foreach ($migrateConfig['migrations'] as $migration) {
-                    $this->taskDrushStack()
+                    $this->getTaskDrushStack()
                         ->siteAlias($this->build->config('build', 'drush_alias'))
                         ->exec("mi $migration")
                         ->run();
@@ -337,12 +353,12 @@ class DrupalRunner extends Tasks
         // Revert features and clear caches.
         $featuresConfig = $this->build->config('features');
         if (!empty($featuresConfig)) {
-            $this->taskDrushStack()
+            $this->getTaskDrushStack()
                 ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->revertAllFeatures()
                 ->run();
         }
-        $this->taskDrushStack()
+        $this->getTaskDrushStack()
             ->siteAlias($this->build->config('build', 'drush_alias'))
             ->clearCache()
             ->run();
@@ -407,25 +423,20 @@ class DrupalRunner extends Tasks
      * @param string $type
      *   The type of steps to run, either 'pre' or 'post'.
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     protected function runSteps($type)
     {
         if ('pre' != $type && 'post' != $type) {
-            throw new \Exception("$type is not a valid step type.");
+            throw new \RuntimeException("$type is not a valid step type.");
         }
 
         $stepsConfig = $this->build->config($type);
-        if ($stepsConfig["enabled"]) {
-            foreach ($stepsConfig["commands"] as $cmd) {
-                $this->taskDrushStack()
-                    ->siteAlias($this->build->config('build', 'drush_alias'))
-                    ->exec($cmd)
-                    ->run();
-            }
-        }
-        if ($stepsConfig["enabled"]) {
-            $this->enableModuleList($stepsConfig['modules']);
+        foreach ($stepsConfig as $cmd) {
+            $this->getTaskDrushStack()
+                ->siteAlias($this->build->config('build', 'drush_alias'))
+                ->exec($cmd)
+                ->run();
         }
     }
 
@@ -444,10 +455,20 @@ class DrupalRunner extends Tasks
             } else {
                 $list = $item;
             }
-            $this->taskDrushStack()
+            $this->getTaskDrushStack()
                 ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec("en $list")
                 ->run();
         }
+    }
+
+    /**
+     * Helper to set a constant path to Drush command.
+     *
+     * @return \Boedah\Robo\Task\DrushStackTask
+     */
+    protected function getTaskDrushStack()
+    {
+        return $this->taskDrushStack(self::DRUSH_COMMAND);
     }
 }

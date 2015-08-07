@@ -1,5 +1,9 @@
+#
+# pre-commit configuration for Drupal Runner.
+#
+
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 'v0.3.0'
+    sha: 'v0.4.1'
     hooks:
     -   id: check-json
     -   id: check-yaml
@@ -9,3 +13,16 @@
     sha: '1.0.0'
     hooks:
     -   id: php-lint
+
+# Using fork of Hootsuite - PHP Pre-commit Hooks (fixes colors and bash syntax error on OS X.)
+#
+# @see https://github.com/ixisandyr/pre-commit-php
+-   repo: git@github.com:ixisandyr/pre-commit-php.git
+    sha: master
+    hooks:
+    - id: php-lint
+    -   id: php-lint-all
+        files: \.(php)$
+    -   id: php-cs
+        files: \.(php)$
+        args: ["--standard=ruleset.xml", "-p", "--colors"]

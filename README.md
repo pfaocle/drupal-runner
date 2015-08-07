@@ -105,9 +105,31 @@ Creating a build from scratch
 
     require 'vendor/autoload.php';
 
-    class Robofile extends Robo\DrupalRunner
+    class Robofile extends \Robo\DrupalRunner
     {
     }
+
+
+Using other Robo tasks with Drupal Runner
+-----------------------------------------
+It may be that your Drupal 7 site build already uses, or will soon use,
+"vanilla" Robo for other development tasks. This is still possible by adding
+your own custom methods to **RoboFile.php**, as usual. For example, it may
+contain custom commands for running site functional or acceptance tests:
+
+    class Robofile extends \Robo\DrupalRunner
+    {
+        public function testsFunctional()
+        {
+            $this->taskCodecept("vendor/bin/codecept")
+                ->suite("functional")
+                ->run();
+        }
+    }
+
+Running Robo will list both sets of commands: those provided by Drupal Runner
+(such as **drupal:magic**) and any custom commands you define directly in
+**RoboFile.php**
 
 
 Running tests
