@@ -8,6 +8,8 @@ Drupal Runner CHANGELOG
 * Collapse pre and post steps modules and commands into simply a list of
   commands. Modules can still be enabled with by defining a command which calls
   "pm-enable" (or its alias, "en").
+* Add configurable database schema type, host and port to configuration along
+  with defaults.
 * Add php-lint as a pre-commit check.
 * Provide a new functional site suite called "build" which will test a built
   dr7 test site hosted on a Druphpet-based VM.
