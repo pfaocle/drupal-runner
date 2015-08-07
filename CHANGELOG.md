@@ -10,7 +10,7 @@ Drupal Runner CHANGELOG
   "pm-enable" (or its alias, "en").
 * Add php-lint as a pre-commit check.
 * Provide a new functional site suite called "build" which will test a built
-  dr7 test site.
+  dr7 test site hosted on a Druphpet-based VM.
 * Update the build configuration system to use symfony/config
 
 0.2.0 - Drush make command-line options
