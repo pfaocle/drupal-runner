@@ -206,7 +206,7 @@ class DrupalBuild
      */
     protected function sitesFileLineCallback($hostnamePattern)
     {
-        return sprintf(self::$sitesFileLinePattern, $hostnamePattern, $this->config['sites_subdir']);
+        return sprintf(DrupalSite::$sitesFileLinePattern, $hostnamePattern, $this->config['sites_subdir']);
     }
 
     /**
@@ -252,7 +252,7 @@ EOS;
         // Empty the build directory.
         $this->taskCleanDir([$this->path()])->run();
         $this->taskExec(
-            "cd {$this->path()} && rm -f " . implode(' ', self::$drupalHiddenFiles)
+            "cd {$this->path()} && rm -f " . implode(' ', DrupalSite::$drupalHiddenFiles)
         )->run();
     }
 }

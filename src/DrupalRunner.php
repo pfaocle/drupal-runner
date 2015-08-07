@@ -8,6 +8,7 @@ namespace Robo;
 
 use Boedah\Robo\Task\Drush;
 use Robo\Drupal\DrupalBuild;
+use Robo\Drupal\DrupalSite;
 use Robo\Task\Shared\TaskException;
 
 /**
@@ -264,7 +265,7 @@ class DrupalRunner extends Tasks
                 ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec('en ' . $this->build->config('site', 'theme'))
                 ->exec('vset theme_default  ' . $this->build->config('site', 'theme'))
-                ->exec('dis ' . DrupalBuild::$drupalDefaultTheme)
+                ->exec('dis ' . DrupalSite::$drupalDefaultTheme)
                 ->run();
         }
     }
@@ -345,7 +346,7 @@ class DrupalRunner extends Tasks
     {
         $this->init();
         // Remove unwanted files.
-        foreach (DrupalBuild::$unwantedFilesPatterns as $pattern) {
+        foreach (DrupalSite::$unwantedFilesPatterns as $pattern) {
             $this->taskExec("rm -R {$this->build->path($pattern)}")->run();
         }
 
