@@ -102,7 +102,7 @@ class GeneratedBuildCest
     {
         $sitesFileContents = <<<EOS
 <?php
-  \$sites['8080.dr7.drupal.dev'] = 'dr7';
+  \$sites['dr7.druphpet.dev'] = 'dr7';
   \$sites['dr7.stage.example.com'] = 'dr7';
   \$sites['dr7.prod.example.com'] = 'dr7';
 EOS;

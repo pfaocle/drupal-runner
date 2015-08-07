@@ -12,7 +12,7 @@ modules:
             populate: false
             cleanup: false
         PhpBrowser:
-            url: 'http://dr7.drupal.dev:8080'
+            url: 'http://dr7.druphpet.dev'
 
 env:
     # Override Db module configuration to run on local.
@@ -20,6 +20,6 @@ env:
         modules:
             config:
                 Db:
-                    dsn: 'mysql:host=33.33.33.10;dbname=dr7'
-                    user: 'root'
-                    password: 'root'
+                    dsn: 'mysql:host=192.168.9.10;dbname=dr7'
+                    user: 'druphpet'
+                    password: 'druphpet'
