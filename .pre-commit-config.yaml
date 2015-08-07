@@ -3,12 +3,13 @@
 #
 
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 'v0.4.1'
+    sha: 'v0.4.2'
     hooks:
     -   id: check-json
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
+    -   id: check-merge-conflict
 -   repo: git://github.com/hootsuite/pre-commit-php.git
     sha: '1.0.0'
     hooks:
