@@ -10,6 +10,7 @@ use Robo\Drupal\Config\BuildConfiguration;
 use Robo\Drupal\Config\YamlBuildLoader;
 use Robo\Task\Exec;
 use Robo\Task\FileSystem;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -113,6 +114,13 @@ class DrupalBuild
         // Convert the config file into an array.
         $loader = new YamlBuildLoader($locator);
         $configValues = $loader->load($locator->locate(self::BUILD_CONFIG_FILE));
+
+        if (!is_array($configValues)) {
+            throw new InvalidConfigurationException(sprintf(
+                "Returned \$configValues was not the expected type (array expected, %s given).",
+                gettype($configValues)
+            ));
+        }
 
         // Process the array using the defined configuration.
         $processor = new Processor();
