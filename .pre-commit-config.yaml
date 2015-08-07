@@ -26,4 +26,8 @@
         files: \.(php)$
     -   id: php-cs
         files: \.(php)$
-        args: ["--standard=ruleset.xml", "-p", "--colors"]
+        exclude: (^tests/)
+        args: ["--standard=PSR2", "-p", "--colors"]
+    -   id: php-cs
+        files: ^tests/.+\.(php)$
+        args: ["--standard=.phpcs.codeception.ruleset.xml", "-p", "--colors"]
