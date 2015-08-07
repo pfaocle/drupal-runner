@@ -10,6 +10,7 @@ use Robo\Drupal\Config\BuildConfiguration;
 use Robo\Drupal\Config\YamlBuildLoader;
 use Robo\Task\Exec;
 use Robo\Task\FileSystem;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -71,7 +72,8 @@ class DrupalBuild
 
     /**
      * @var array
-     *   Stores the build configuration, as loaded and validated by symfony/config
+     *   Stores the build configuration, as loaded and validated by
+     *   symfony/config
      */
     protected $config;
 
@@ -114,11 +116,19 @@ class DrupalBuild
         $loader = new YamlBuildLoader($locator);
         $configValues = $loader->load($locator->locate(self::BUILD_CONFIG_FILE));
 
+        if (!is_array($configValues)) {
+            throw new InvalidConfigurationException(sprintf(
+                "Returned \$configValues was not the expected type (array expected, %s given).",
+                gettype($configValues)
+            ));
+        }
+
         // Process the array using the defined configuration.
         $processor = new Processor();
         $configuration = new BuildConfiguration();
 
-        // Configuration, validated. Will throw an InvalidConfigurationException if the configuration is invalid.
+        // Configuration, validated. Will throw an InvalidConfigurationException
+        // if the configuration is invalid.
         return $processor->processConfiguration($configuration, $configValues);
     }
 
@@ -126,19 +136,23 @@ class DrupalBuild
      * Returns an individual piece of build configuration.
      *
      * @param string $section
-     *   The section of configuration to return, or in which the given $key is. For example, 'site', 'pre', etc.
-     *   Defaults to 'build', returning the entire (top-level) configuration tree.
+     *   The section of configuration to return, or in which the given $key is.
+     *   For example, 'site', 'pre', etc. Defaults to 'build', returning the
+     *   entire (top-level) configuration tree.
      * @param string $key
-     *   The key of the configuration element to get. If null the entire $section of configuration is returned.
+     *   The key of the configuration element to get. If null the entire
+     *   $section of configuration is returned.
      * @param bool $refresh
      *   Load in config from file.
      *
      * @return array|string|null
-     *   An array of parsed configuration for $section, the value of the configuration $key, or null if not found.
+     *   An array of parsed configuration for $section, the value of the
+     *   configuration $key, or null if not found.
      */
     public function config($section = "build", $key = null, $refresh = false)
     {
-        // Load the full configuration from disk if either it's currently empty or we've requested it to be refreshed.
+        // Load the full configuration from disk if either it's currently empty
+        // or we've requested it to be refreshed.
         if ($refresh || empty($this->config)) {
             $this->config = $this->loadConfig();
         }
@@ -148,8 +162,8 @@ class DrupalBuild
             return $section === "build" ? $this->config : $this->config[$section];
         }
 
-        // If no $section is passed, 'build' is assumed. A key in the 'build' section is actually in the root of the
-        // configuration tree.
+        // If no $section is passed, 'build' is assumed. A key in the 'build'
+        // section is actually in the root of the configuration tree.
         if ($section == "build") {
             return $this->config[$key];
         }
@@ -162,7 +176,8 @@ class DrupalBuild
      * Returns an absolute path to a given relative one.
      *
      * @param string $path
-     *   A path relative to the build directory root. Should not start or end with a /
+     *   A path relative to the build directory root. Should not start or end
+     *   with a /
      *
      * @return string
      *   The absolute path.
@@ -225,8 +240,9 @@ if (file_exists(conf_path() . '/settings.$env.php')) {
 
 EOS;
 
-        // If the string is NOT already present in the file (e.g. from a previous build), write the inclusion of
-        // environment specific configuration to main settings.php file.
+        // If the string is NOT already present in the file (e.g. from a
+        // previous build), write the inclusion of environment specific
+        // configuration to main settings.php file.
         $settingsFilePath = "sites/{$this->config['sites_subdir']}/settings.php";
         if (strpos(file_get_contents($this->path($settingsFilePath)), $envSettings) === false) {
             $this->taskExec("chmod u+w {$this->path($settingsFilePath)}")->run();
@@ -243,7 +259,8 @@ EOS;
      */
     public function cleanBuildDirectory()
     {
-        // If the sites subdirectory exists, it may have no write permissions for any user.
+        // If the sites subdirectory exists, it may have no write permissions
+        // for any user.
         $sitesSubdirPath = $this->path('sites/' . $this->config['sites_subdir']);
         if (file_exists($sitesSubdirPath)) {
             $this->taskExec("cd {$this->path()} && chmod u+w $sitesSubdirPath")->run();

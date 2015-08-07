@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * DrupalRunner - an extension to Robo for building Drupal.
- */
 
 namespace Robo;
 
@@ -12,9 +8,7 @@ use Robo\Drupal\DrupalSite;
 use Robo\Task\Shared\TaskException;
 
 /**
- * Class DrupalRunner.
- *
- * @package Robo
+ * DrupalRunner - an extension to Robo for building Drupal.
  */
 class DrupalRunner extends Tasks
 {
@@ -42,7 +36,8 @@ class DrupalRunner extends Tasks
     protected $build;
 
     /**
-     * Every task should run this first to establish we're good to run before any tasks are executed.
+     * Every task should run this first to establish we're good to run before
+     * any tasks are executed.
      */
     protected function init()
     {
@@ -52,7 +47,7 @@ class DrupalRunner extends Tasks
     }
 
     /**
-     * Runs everything, from nuking the target directory through to working site.
+     * Run everything from nuking the target directory through to working site.
      *
      * @desc Run a complete rebuild
      *
@@ -98,21 +93,28 @@ class DrupalRunner extends Tasks
         $sitesSubdir = 'sites/' . $this->build->config("build", "sites_subdir");
 
         if ($opts['nuke']) {
-            // If we're actually running within the directory we've been asked to nuke, things will most certainly go
-            // awry. Check this and throw an exception if this is the case.
+            // If we're actually running within the directory we've been asked
+            // to nuke, things will most certainly go awry. Check this and throw
+            // an exception if this is the case.
             if (strpos(getcwd(), realpath($this->build->path())) !== false) {
-                throw new TaskException(__CLASS__, "You cannot use --nuke from a build within the target directory.");
+                throw new TaskException(
+                    __CLASS__,
+                    "You cannot use --nuke from a build within the target directory."
+                );
             }
 
-            // Perform a few checks on the local repository - if we're in a state where the user is likely to lose local
-            // changes, given them the opportunity to quit.
+            // Perform a few checks on the local repository - if we're in a
+            // state where the user is likely to lose local changes, given them
+            // the opportunity to quit.
             //
-            // We assume a remote named GIT_REMOTE ('origin') by not passing anything as the second parameter. This is
-            // currently acceptable as we're cloning the repository afresh each time and the remote will be named
-            // 'origin'.
+            // We assume a remote named GIT_REMOTE ('origin') by not passing
+            // anything as the second parameter. This is currently acceptable as
+            // we're cloning the repository afresh each time and the remote will
+            // be named 'origin'.
             $this->checkLocalGit($this->build->path($sitesSubdir));
 
-            // If we're this far, the user is OK with us emptying target directory and continuing.
+            // If we're this far, the user is OK with us emptying target
+            // directory and continuing.
             $this->build->cleanBuildDirectory();
 
             // Clone the Git repository.
@@ -180,8 +182,8 @@ class DrupalRunner extends Tasks
         $site = $config['site'];
         $db = $config['database'];
 
-        // For database builds, we install Drupal core using the minimal profile (to handle settings.php etc), then
-        // import the source database.
+        // For database builds, we install Drupal core using the minimal profile
+        // (to handle settings.php etc), then import the source database.
         $installDb = $this->build->config('build', 'install_db');
         if ($installDb) {
             if (!file_exists($installDb)) {
@@ -215,8 +217,10 @@ class DrupalRunner extends Tasks
         if ($installDb) {
             // @todo Backup DB?
 
-            // Import DB. Note we drop the entire database here, as there could be tables in the minimal install
-            // that aren't present in the imported SQL (nor are there any DROP TABLE x IF EXISTS... statements).
+            // Import DB. Note we drop the entire database here, as there could
+            // be tables in the minimal install that aren't present in the
+            // imported SQL (nor are there any DROP TABLE x IF EXISTS...
+            // statements).
             $this->getTaskDrushStack()
                 ->siteAlias($this->build->config('build', 'drush_alias'))
                 ->exec('sql-drop')
@@ -229,7 +233,10 @@ class DrupalRunner extends Tasks
 
 
     /**
-     * Step 3: pre-steps. Run Drush commands and enable modules - steps that should happen before anything else.
+     * Step 3: pre-steps.
+     *
+     * Run Drush commands and enable modules - steps that should happen before
+     * anything else.
      *
      * @desc Pre-steps [3]
      */
@@ -327,7 +334,10 @@ class DrupalRunner extends Tasks
     }
 
     /**
-     * Step 7: post-steps. Drush commands to run and modules to enable after everything else, but before clean-up.
+     * Step 7: post-steps.
+     *
+     * Drush commands to run and modules to enable after everything else, but
+     * before clean-up.
      *
      * @desc Post-steps [7]
      */
@@ -367,7 +377,8 @@ class DrupalRunner extends Tasks
     /**
      * Do some quick checks on the local repository before proceeding.
      *
-     * Warn the user if their Git repository is dirty or contains changes not yet pushed to the (default) remote.
+     * Warn the user if their Git repository is dirty or contains changes not
+     * yet pushed to the (default) remote.
      *
      * @param string $repositoryPath
      *   Absolute path to the Git repository to check.
@@ -384,12 +395,15 @@ class DrupalRunner extends Tasks
             );
         }
 
-        // If comparing the local branch to remote with cherry returns something other than an empty message, we have
-        // local changes not pushed to remote yet.
+        // If comparing the local branch to remote with cherry returns something
+        // other than an empty message, we have local changes not pushed to
+        // remote yet.
         //
-        // Note that this should also cover the case where we're on a local branch that hasn't been pushed at all,
-        // PROVIDING there are commits on the local branch. `git cherry [REMOTE]` still returns a list of local-only
-        // commits even without an upstream copy of the branch. 'Empty' local branches will be lost.
+        // Note that this should also cover the case where we're on a local
+        // branch that hasn't been pushed at all, PROVIDING there are commits on
+        // the local branch. `git cherry [REMOTE]` still returns a list of
+        // local-only commits even without an upstream copy of the branch.
+        // 'Empty' local branches will be lost.
         $ret = $this->taskExec("cd $repositoryPath && git cherry $remote")->run();
         if ($ret->getMessage() != null) {
             $this->askContinueQuestion(
@@ -444,8 +458,9 @@ class DrupalRunner extends Tasks
      * Helper function to enable a list of modules/themes/features.
      *
      * @param array $list
-     *   An nested array of things to enable. If the item is a string, enable it on it's own. If the item is an array,
-     *   implode it and enable them all at once.
+     *   An nested array of things to enable. If the item is a string, enable it
+     *   on it's own. If the item is an array, implode it and enable them all at
+     *   once.
      */
     protected function enableModuleList($list)
     {
